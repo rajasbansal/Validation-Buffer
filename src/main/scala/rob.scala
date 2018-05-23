@@ -1000,7 +1000,7 @@ class Rob(width: Int,
 
       var r_idx = 0
       // scalastyle:off
-      printf("Rajas Debug: %c %c %c\n", Mux(rob_head_is_load,Str("L"),Str("X")), Mux(rob_head_is_store,Str("S"),Str("X")), Mux(rob_head_is_branch,Str("B"),Str("X")))
+      printf("Rajas Debug: %c %c %c\n", Mux(rob_head_is_load(0),Str("L"),Str("X")), Mux(rob_head_is_store(0),Str("S"),Str("X")), Mux(rob_head_is_branch(0),Str("B"),Str("X")))
       for (i <- 0 until (NUM_ROB_ENTRIES/COMMIT_WIDTH))
       {
 //            rob[ 0]           (  )(  ) 0x00002000 [ -                       ][unknown                  ]    ,   (d:X p 1, bm:0 - sdt: 0) (d:- p 3, bm:f - sdt:60)
