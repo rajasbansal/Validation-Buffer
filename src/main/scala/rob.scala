@@ -474,7 +474,8 @@ class Rob(width: Int,
       // Commit or Rollback
 
       // can this instruction commit? (the check for exceptions/rob_state happens later)
-      can_commit(w) := rob_val(rob_head) && !(rob_bsy(rob_head))
+      can_commit(w) := rob_val(rob_head) && !(rob_bsy(rob_head)) /* This is where we have to change i.e the
+                                                                    instruction can commit because it cannot throw exception*/
 
       val com_idx = Wire(UInt())
       com_idx := rob_head
@@ -999,6 +1000,7 @@ class Rob(width: Int,
 
       var r_idx = 0
       // scalastyle:off
+      printf("Rajas Debug: %c %c %c\n", Mux(rob_uop(rob_head).is_load,Str("L"),Str("X")), Mux(rob_uop(rob_head).is_store,Str("S"),Str("X")), Mux(rob_uop(rob_head).is_branch,Str("B"),Str("X")))
       for (i <- 0 until (NUM_ROB_ENTRIES/COMMIT_WIDTH))
       {
 //            rob[ 0]           (  )(  ) 0x00002000 [ -                       ][unknown                  ]    ,   (d:X p 1, bm:0 - sdt: 0) (d:- p 3, bm:f - sdt:60)
