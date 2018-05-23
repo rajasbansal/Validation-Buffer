@@ -1001,7 +1001,7 @@ class Rob(width: Int,
       var r_idx = 0
       // scalastyle:off
       printf("Rajas Debug: %c%c, %c%c, %c%c\n", Mux(rob_head_is_load(0),Str("L"),Str("X")), Mux(rob_head_is_load(1),Str("L"),Str("X")), Mux(rob_head_is_store(0),Str("S"),Str("X")), Mux(rob_head_is_store(1),Str("S"),Str("X")), Mux(rob_head_is_branch(0),Str("B"),Str("X")), Mux(rob_head_is_branch(1),Str("B"),Str("X")))
-      printf("See the valids to check- %c%c\n", Mux(rob_head_vals(0), str("V"), str("-")), Mux(rob_head_vals(1), str("V"), str("-")))
+      printf("See the valids to check- %c%c\n", Mux(rob_head_vals(0), Str("V"), Str("-")), Mux(rob_head_vals(1), Str("V"), Str("-")))
       println("The commit width is " + COMMIT_WIDTH)
       for (i <- 0 until (NUM_ROB_ENTRIES/COMMIT_WIDTH))
       {
