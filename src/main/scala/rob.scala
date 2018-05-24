@@ -1003,6 +1003,7 @@ class Rob(width: Int,
       printf("Rajas Debug: %c%c, %c%c, %c%c\n", Mux(rob_head_is_load(0),Str("L"),Str("X")), Mux(rob_head_is_load(1),Str("L"),Str("X")), Mux(rob_head_is_store(0),Str("S"),Str("X")), Mux(rob_head_is_store(1),Str("S"),Str("X")), Mux(rob_head_is_branch(0),Str("B"),Str("X")), Mux(rob_head_is_branch(1),Str("B"),Str("X")))
       printf("See the valids to check- %c%c\n", Mux(rob_head_vals(0), Str("V"), Str("-")), Mux(rob_head_vals(1), Str("V"), Str("-")))
       printf("The commit width is " + COMMIT_WIDTH + "\n")
+      printf("%x\n",PriorityEncoder(UInt(0,5)))
       for (i <- 0 until (NUM_ROB_ENTRIES/COMMIT_WIDTH))
       {
 //            rob[ 0]           (  )(  ) 0x00002000 [ -                       ][unknown                  ]    ,   (d:X p 1, bm:0 - sdt: 0) (d:- p 3, bm:f - sdt:60)
