@@ -23,7 +23,7 @@ trait BOOMDebugConstants
 {
    val DEBUG_PRINTF        = true  // use the Chisel printf functionality
    val COMMIT_LOG_PRINTF   = true // dump commit state, for comparision against ISA sim
-   val O3PIPEVIEW_PRINTF   = false // dump trace for O3PipeView from gem5
+   val O3PIPEVIEW_PRINTF   = true // dump trace for O3PipeView from gem5
    val O3_CYCLE_TIME       = (1000)// "cycle" time expected by o3pipeview.py
 
    // turn off stuff to dramatically reduce Chisel node count
