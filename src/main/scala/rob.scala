@@ -547,6 +547,7 @@ class Rob(width: Int,
       rob_head_fflags(w)   := rob_fflags(rob_head)
       rob_head_is_store(w) := rob_uop(rob_head).is_store
       rob_head_is_load(w)  := rob_uop(rob_head).is_load
+      rob_head_is_branch(w):= rob_uop(rob_uop).br_or_jmp
       rob_getpc_curr_vals(w) := rob_val(GetRowIdx(io.get_pc.rob_idx))
       rob_getpc_next_vals(w) := rob_val(WrapInc(GetRowIdx(io.get_pc.rob_idx), num_rob_rows))
 
@@ -1002,10 +1003,8 @@ class Rob(width: Int,
       // scalastyle:off
       printf("Rajas Debug: %c%c, %c%c, %c%c\n", Mux(rob_head_is_load(0),Str("L"),Str("X")), Mux(rob_head_is_load(1),Str("L"),Str("X")), Mux(rob_head_is_store(0),Str("S"),Str("X")), Mux(rob_head_is_store(1),Str("S"),Str("X")), Mux(rob_head_is_branch(0),Str("B"),Str("X")), Mux(rob_head_is_branch(1),Str("B"),Str("X")))
       printf("See the valids to check- %c%c\n", Mux(rob_head_vals(0), Str("V"), Str("-")), Mux(rob_head_vals(1), Str("V"), Str("-")))
-      printf("The commit width is " + COMMIT_WIDTH + "\n")
-      printf("%x\n",PriorityEncoder(UInt(0,5)))
-      printf("- State - %b", rob_state === s_normal)
-      printf("- Not Empty- %b", rob_head === rob_tail)
+      printf("- Is in normal state? - %b\n", rob_state === s_normal)
+      printf("- Is Empty?- %b\n", rob_head === rob_tail)
       for (i <- 0 until (NUM_ROB_ENTRIES/COMMIT_WIDTH))
       {
 //            rob[ 0]           (  )(  ) 0x00002000 [ -                       ][unknown                  ]    ,   (d:X p 1, bm:0 - sdt: 0) (d:- p 3, bm:f - sdt:60)
