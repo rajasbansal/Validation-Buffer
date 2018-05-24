@@ -547,7 +547,7 @@ class Rob(width: Int,
       rob_head_fflags(w)   := rob_fflags(rob_head)
       rob_head_is_store(w) := rob_uop(rob_head).is_store
       rob_head_is_load(w)  := rob_uop(rob_head).is_load
-      rob_head_is_branch(w):= rob_uop(rob_uop).br_or_jmp
+      rob_head_is_branch(w):= rob_uop(rob_head).br_or_jmp
       rob_getpc_curr_vals(w) := rob_val(GetRowIdx(io.get_pc.rob_idx))
       rob_getpc_next_vals(w) := rob_val(WrapInc(GetRowIdx(io.get_pc.rob_idx), num_rob_rows))
 
