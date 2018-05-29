@@ -1248,6 +1248,7 @@ class BoomCore(implicit p: Parameters, edge: uncore.tilelink2.TLEdgeOut) extends
 
          when (rob.io.commit.valids(w))
          {
+            printf("Commit log: ")
             when (rob.io.commit.uops(w).dst_rtype === RT_FIX && rob.io.commit.uops(w).ldst =/= UInt(0))
             {
                printf("%d 0x%x (0x%x) x%d 0x%x\n",

@@ -27,9 +27,9 @@ trait BOOMDebugConstants
    val O3_CYCLE_TIME       = (1000)// "cycle" time expected by o3pipeview.py
 
    // turn off stuff to dramatically reduce Chisel node count
-   val DEBUG_PRINTF_LSU    = true && DEBUG_PRINTF
+   val DEBUG_PRINTF_LSU    = false && DEBUG_PRINTF
    val DEBUG_PRINTF_ROB    = true && DEBUG_PRINTF
-   val DEBUG_PRINTF_TAGE   = true && DEBUG_PRINTF
+   val DEBUG_PRINTF_TAGE   = false && DEBUG_PRINTF
    val DEBUG_PRINTF_BROB   = false && DEBUG_PRINTF
 
    // BPD asserts can be too heavy-handed for something that we're okay giving incorrect answers.
