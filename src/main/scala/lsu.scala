@@ -134,7 +134,8 @@ class LoadStoreUnitIO(pl_width: Int)(implicit p: Parameters) extends BoomBundle(
 
    val debug_tsc = UInt(INPUT, xLen)     // time stamp counter
 
-   val emit_validated = new ValidIO(new EmitValidated)
+   val emit_validated_ld = new ValidIO(new EmitValidated)
+   val emit_validated_st = new ValidIO(new EmitValidated)
 
    override def cloneType: this.type = new LoadStoreUnitIO(pl_width)(p).asInstanceOf[this.type]
 }
@@ -1009,10 +1010,17 @@ class LoadStoreUnit(pl_width: Int)(implicit p: Parameters, edge: uncore.tilelink
    io.xcpt.bits := r_xcpt
    // Emit the validated changes
    // val isValidated = Reg(next = io.exe_resp.valid && dtlb.io.req.valid,init = false)
-   io.emit_validated.valid := can_fire_load_wakeup
-   io.emit_validated.bits.rob_idx := laq_uop(exe_ld_idx_wakeup).rob_idx
-   when (io.emit_validated.valid) {
-      printf("\n---- This load has been validated %d\n", io.emit_validated.bits.rob_idx)
+   io.emit_validated_ld.valid := can_fire_load_wakeup
+   io.emit_validated_ld.bits.rob_idx := laq_uop(exe_ld_idx_wakeup).rob_idx
+   when (io.emit_validated_ld.valid) {
+      printf("\n---- This load has been validated %d\n", io.emit_validated_ld.bits.rob_idx)
+   }
+
+   // Emit the validated store
+   io.emit_validated_st.valid := can_fire_store_commit
+   io.emit_validated_st.bits.rob_idx := stq_uop(stq_execute_head).rob_idx
+   when (io.emit_validated_ld.valid) {
+      printf("\n---- This store has been validated %d\n", io.emit_validated_ld.bits.rob_idx)
    }
 
    //-------------------------------------------------------------

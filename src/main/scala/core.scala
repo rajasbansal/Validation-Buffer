@@ -682,7 +682,8 @@ class BoomCore(implicit p: Parameters, edge: uncore.tilelink2.TLEdgeOut) extends
 
    // enqueue basic load/store info in Decode
    lsu.io.dec_uops := dec_uops
-   rob.io.receive_validated_ld := lsu.io.emit_validated
+   rob.io.receive_validated_ld := lsu.io.emit_validated_ld
+   rob.io.receive_validated_st := lsu.io.emit_validated_st
    for (w <- 0 until DECODE_WIDTH)
    {
       lsu.io.dec_st_vals(w) := dec_will_fire(w) && rename_stage.io.inst_can_proceed(w) && !rob.io.flush.valid &&

@@ -102,6 +102,9 @@ class RobIo(machine_width: Int,
 
    //receive information of validated load
    val receive_validated_ld = new ValidIO(new EmitValidated).flip
+
+   //receive information of validated store
+   val receive_validated_st = new ValidIO(new EmitValidated).flip
 }
 
 
@@ -384,7 +387,11 @@ class Rob(width: Int,
       // Check the incoming signal
       when (io.receive_validated_ld.valid && MatchBank(GetBankIdx(io.receive_validated_ld.bits.rob_idx))){
          rob_validated(GetRowIdx(io.receive_validated_ld.bits.rob_idx)) := Bool(true)
-         printf("\n-------- Received the signal from the lsu\n")
+         printf("\n-------- Received the load valid signal from the lsu\n")
+      }
+      when (io.receive_validated_st.valid && MatchBank(GetBankIdx(io.receive_validated_st.bits.rob_idx))){
+         rob_validated(GetRowIdx(io.receive_validated_st.bits.rob_idx)) := Bool(true)
+         printf("\n-------- Received the store valid signal from the lsu\n")
       }
 
 
