@@ -380,6 +380,14 @@ class Rob(width: Int,
       val rob_fflags    = Mem(num_rob_rows, Bits(width=tile.FPConstants.FLAGS_SZ))
 
       //-----------------------------------------------
+      // Check the incoming signal
+      when (io.receive_validated_ld.valid && MatchBank(GetBankIdx(io.receive_validated_ld.bits.rob_idx))){
+         rob_validated(GetRowIdx(io.receive_validated_ld.bits.rob_idx)) := Bool(true)
+         printf("\n-------- Received the signal from the lsu\n")
+      }
+
+
+      //-----------------------------------------------
       // Dispatch: Add Entry to ROB
 
       when (io.enq_valids(w))
@@ -391,6 +399,7 @@ class Rob(width: Int,
          rob_exception(rob_tail) := io.enq_uops(w).exception
          rob_fflags(rob_tail)    := Bits(0)
          rob_uop(rob_tail).stat_brjmp_mispredicted := Bool(false)
+         rob_validated(rob_tail) := Bool(false)
 
          assert (rob_val(rob_tail) === Bool(false),"[rob] overwriting a valid entry.")
          assert ((io.enq_uops(w).rob_idx >> log2Ceil(width)) === rob_tail)
