@@ -1019,8 +1019,8 @@ class LoadStoreUnit(pl_width: Int)(implicit p: Parameters, edge: uncore.tilelink
    // Emit the validated store
    io.emit_validated_st.valid := can_fire_store_commit
    io.emit_validated_st.bits.rob_idx := stq_uop(stq_execute_head).rob_idx
-   when (io.emit_validated_ld.valid) {
-      printf("\n---- This store has been validated %d\n", io.emit_validated_ld.bits.rob_idx)
+   when (io.emit_validated_st.valid) {
+      printf("\n---- This store has been validated %d\n", io.emit_validated_st.bits.rob_idx)
    }
 
    //-------------------------------------------------------------
