@@ -413,7 +413,6 @@ class Rob(width: Int,
          .elsewhen((io.enq_uops(w).is_store || io.enq_uops(w).is_load || io.enq_uops(w).is_amo || io.enq_uops(w).is_fencei || io.enq_uops(w).is_fence || io.enq_uops(w).is_br_or_jmp || io.enq_uops(w).flush_on_commit)){
             rob_validated(rob_tail) := Bool(true)
          }
-         rob_validated(rob_tail) := Bool(false)
 
          assert (rob_val(rob_tail) === Bool(false),"[rob] overwriting a valid entry.")
          assert ((io.enq_uops(w).rob_idx >> log2Ceil(width)) === rob_tail)
