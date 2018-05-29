@@ -145,7 +145,11 @@ class Exception(implicit p: Parameters) extends BoomBundle()(p)
    val cause = Bits(width=log2Up(rocket.Causes.all.max))
    val badvaddr = UInt(width=coreMaxAddrBits)
 }
-
+// Emitting the signal for completion of validation
+class EmitValidated(implicit p: Parameters) extends BoomBundle()(p)
+{
+   val rob_idx = UInt(width = ROB_ADDR_SZ)
+}
 
 // provide a port for a FU to get the PC of an instruction from the ROB
 // and the BROB index too.
@@ -365,6 +369,10 @@ class Rob(width: Int,
       val rob_uop       = Reg(Vec(num_rob_rows, new MicroOp())) // one write port - dispatch
                                                            // fake write ports - clearing on commit,
                                                            // rollback, branch_kill
+
+      // Validated field for each row in the bank
+      val rob_validated = Reg(init = Vec.fill(num_rob_rows){Bool(false)})
+      
       val rob_exception = Mem(num_rob_rows, Bool())
       val rob_fflags    = Mem(num_rob_rows, Bits(width=tile.FPConstants.FLAGS_SZ))
 

@@ -134,6 +134,8 @@ class LoadStoreUnitIO(pl_width: Int)(implicit p: Parameters) extends BoomBundle(
 
    val debug_tsc = UInt(INPUT, xLen)     // time stamp counter
 
+   val emit_validated = new ValidIO(new EmitValidated)
+
    override def cloneType: this.type = new LoadStoreUnitIO(pl_width)(p).asInstanceOf[this.type]
 }
 
@@ -1005,6 +1007,11 @@ class LoadStoreUnit(pl_width: Int)(implicit p: Parameters, edge: uncore.tilelink
 
    io.xcpt.valid := r_xcpt_valid && !io.exception && !IsKilledByBranch(io.brinfo, r_xcpt.uop)
    io.xcpt.bits := r_xcpt
+   // Emit the validated changes
+   // val isValidated = Reg(next = io.exe_resp.valid && dtlb.io.req.valid,init = false)
+   io.emit_validated.valid := can_fire_load_wakeup
+   io.emit_validated.bits.rob_idx = laq_uop(exe_ld_idx_wakeup).rob_idx
+
 
    //-------------------------------------------------------------
    // Kill speculated entries on branch mispredict
