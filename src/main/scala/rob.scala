@@ -219,6 +219,7 @@ class Rob(width: Int,
    val rob_head_is_load    = Wire(Vec(width, Bool()))
    val rob_head_is_branch  = Wire(Vec(width, Bool()))
    val rob_head_fflags     = Wire(Vec(width, Bits(width=tile.FPConstants.FLAGS_SZ)))
+   val rob_head_validated  = Wire(Vec(width, Bool()))
 
    // valid bits at the branch target
    // the br_unit needs to verify the target PC, but it must read out the valid bits
@@ -564,6 +565,7 @@ class Rob(width: Int,
       // -----------------------------------------------
       // Outputs
       rob_head_vals(w)     := rob_val(rob_head)
+      rob_head_validated(w):= rob_validated(rob_head)
       rob_head_fflags(w)   := rob_fflags(rob_head)
       rob_head_is_store(w) := rob_uop(rob_head).is_store
       rob_head_is_load(w)  := rob_uop(rob_head).is_load
@@ -1025,6 +1027,7 @@ class Rob(width: Int,
       printf("See the valids to check- %c%c\n", Mux(rob_head_vals(0), Str("V"), Str("-")), Mux(rob_head_vals(1), Str("V"), Str("-")))
       printf("- Is in normal state? - %b\n", rob_state === s_normal)
       printf("- Is Empty?- %b\n", rob_head === rob_tail)
+      printf("Have the instructions been validated- %c%c\n", Mux(rob_head_validated(0), Str("V"), Str("-")), Mux(rob_head_validated(1), Str("V"), Str("-")))
       for (i <- 0 until (NUM_ROB_ENTRIES/COMMIT_WIDTH))
       {
 //            rob[ 0]           (  )(  ) 0x00002000 [ -                       ][unknown                  ]    ,   (d:X p 1, bm:0 - sdt: 0) (d:- p 3, bm:f - sdt:60)
