@@ -99,6 +99,9 @@ class RobIo(machine_width: Int,
    val debug = new DebugRobSignals().asOutput
 
    val debug_tsc = UInt(INPUT, xLen)
+
+   //receive information of validated load
+   val receive_validated_ld = new ValidIO(new EmitValidated).flip
 }
 
 
