@@ -407,10 +407,10 @@ class Rob(width: Int,
          rob_exception(rob_tail) := io.enq_uops(w).exception
          rob_fflags(rob_tail)    := Bits(0)
          rob_uop(rob_tail).stat_brjmp_mispredicted := Bool(false)
-         if (!(io.enq_uops(w).is_store || io.enq_uops(w).is_load || io.enq_uops(w).is_amo || io.enq_uops(w).is_fencei || io.enq_uops(w).is_fence || io.enq_uops(w).is_jump || io.enq_uops(w).flush_on_commit)){
+         when (!(io.enq_uops(w).is_store || io.enq_uops(w).is_load || io.enq_uops(w).is_amo || io.enq_uops(w).is_fencei || io.enq_uops(w).is_fence || io.enq_uops(w).is_jump || io.enq_uops(w).flush_on_commit)){
             rob_validated(rob_tail) := Bool(false)
          }
-         else {
+         .elsewhen((io.enq_uops(w).is_store || io.enq_uops(w).is_load || io.enq_uops(w).is_amo || io.enq_uops(w).is_fencei || io.enq_uops(w).is_fence || io.enq_uops(w).is_br_or_jmp || io.enq_uops(w).flush_on_commit)){
             rob_validated(rob_tail) := Bool(true)
          }
          rob_validated(rob_tail) := Bool(false)
