@@ -29,7 +29,7 @@ case class BoomCoreParams(
    enablePrefetching: Boolean = false,
    enableFetchBufferFlowThrough: Boolean = true,
    enableBrResolutionRegister: Boolean = true,
-   enableCommitMapTable: Boolean = false,
+   enableCommitMapTable: Boolean = true,
    enableBTBContainsBranches: Boolean = true,
    enableBIM: Boolean = true,
    enableBranchPredictor: Boolean = false,
