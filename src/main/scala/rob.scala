@@ -533,7 +533,7 @@ class Rob(width: Int,
 
       if (ENABLE_COMMIT_MAP_TABLE)
       {
-         when (Reg(next=exception_thrown))
+         when (Reg(next=exception_thrown) || io.flush.valid)
          {
             for (i <- 0 until num_rob_rows)
             {
@@ -822,7 +822,7 @@ class Rob(width: Int,
 
    if (ENABLE_COMMIT_MAP_TABLE)
    {
-      when (Reg(next=exception_thrown))
+      when (Reg(next=exception_thrown) || io.flush.valid)
       {
          rob_tail := UInt(0)
          rob_head := UInt(0)
