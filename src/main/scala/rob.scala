@@ -822,10 +822,14 @@ class Rob(width: Int,
 
    if (ENABLE_COMMIT_MAP_TABLE)
    {
-      when (Reg(next=exception_thrown) || io.flush.valid)
+      when (Reg(next=exception_thrown))
       {
          rob_tail := UInt(0)
          rob_head := UInt(0)
+      }
+      .elsewhen (io.flush.valid)
+      {
+         rob_tail := rob_head
       }
    }
 
