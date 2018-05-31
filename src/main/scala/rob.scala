@@ -573,6 +573,9 @@ class Rob(width: Int,
 
       // -----------------------------------------------
       // Outputs
+      when (rob_uop(rob_head).flush_on_commit){
+         printf("Is a flush on commit %d\n", w)
+      }
       rob_head_vals(w)     := rob_val(rob_head)
       rob_head_validated(w):= rob_validated(rob_head)
       rob_head_fflags(w)   := rob_fflags(rob_head)
