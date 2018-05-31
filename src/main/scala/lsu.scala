@@ -1028,7 +1028,7 @@ class LoadStoreUnit(pl_width: Int)(implicit p: Parameters, edge: uncore.tilelink
       when (io.emit_validated_st.valid) {
          printf("\n---- This store has been validated %d\n", io.emit_validated_st.bits.rob_idx)
       }
-   |
+   }
    //-------------------------------------------------------------
    // Kill speculated entries on branch mispredict
    //-------------------------------------------------------------
