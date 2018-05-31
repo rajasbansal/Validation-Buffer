@@ -385,15 +385,16 @@ class Rob(width: Int,
 
       //-----------------------------------------------
       // Check the incoming signal
-      when (io.receive_validated_ld.valid && MatchBank(GetBankIdx(io.receive_validated_ld.bits.rob_idx))){
-         rob_validated(GetRowIdx(io.receive_validated_ld.bits.rob_idx)) := Bool(true)
-         printf("\n-------- Received the load valid signal from the lsu\n")
+      if (DEBUG_VB){
+         when (io.receive_validated_ld.valid && MatchBank(GetBankIdx(io.receive_validated_ld.bits.rob_idx))){
+            rob_validated(GetRowIdx(io.receive_validated_ld.bits.rob_idx)) := Bool(true)
+            printf("\n-------- Received the load valid signal from the lsu\n")
+         }
+         when (io.receive_validated_st.valid && MatchBank(GetBankIdx(io.receive_validated_st.bits.rob_idx))){
+            rob_validated(GetRowIdx(io.receive_validated_st.bits.rob_idx)) := Bool(true)
+            printf("\n-------- Received the store valid signal from the lsu\n")
+         }
       }
-      when (io.receive_validated_st.valid && MatchBank(GetBankIdx(io.receive_validated_st.bits.rob_idx))){
-         rob_validated(GetRowIdx(io.receive_validated_st.bits.rob_idx)) := Bool(true)
-         printf("\n-------- Received the store valid signal from the lsu\n")
-      }
-
 
       //-----------------------------------------------
       // Dispatch: Add Entry to ROB

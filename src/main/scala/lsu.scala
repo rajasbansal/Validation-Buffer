@@ -1012,10 +1012,11 @@ class LoadStoreUnit(pl_width: Int)(implicit p: Parameters, edge: uncore.tilelink
    // val isValidated = Reg(next = io.exe_resp.valid && dtlb.io.req.valid,init = false)
    io.emit_validated_ld.valid := can_fire_load_wakeup
    io.emit_validated_ld.bits.rob_idx := laq_uop(exe_ld_idx_wakeup).rob_idx
-   when (io.emit_validated_ld.valid) {
-      printf("\n---- This load has been validated %d\n", io.emit_validated_ld.bits.rob_idx)
+   if (DEBUG_VB){   
+      when (io.emit_validated_ld.valid) {
+         printf("\n---- This load has been validated %d\n", io.emit_validated_ld.bits.rob_idx)
+      }
    }
-
    // Emit the validated store
    // io.emit_validated_st.valid := can_fire_store_commit
    // io.emit_validated_st.valid := (will_fire_sta_incoming && !saq_is_virtual(io.exe_resp.bits.uop.stq_idx)) || (will_fire_sta_retry && !saq_is_virtual(stq_retry_idx))
@@ -1023,10 +1024,11 @@ class LoadStoreUnit(pl_width: Int)(implicit p: Parameters, edge: uncore.tilelink
    io.emit_validated_st.valid := mem_fired_sta && !mem_tlb_miss
    // io.emit_validated_st.bits.rob_idx := Mux(will_fire_sta_incoming, io.exe_resp.bits.uop.rob_idx, stq_uop(stq_retry_idx).rob_idx)
    io.emit_validated_st.bits.rob_idx := mem_tlb_uop.rob_idx
-   when (io.emit_validated_st.valid) {
-      printf("\n---- This store has been validated %d\n", io.emit_validated_st.bits.rob_idx)
-   }
-
+   if (DEBUG_VB){ 
+      when (io.emit_validated_st.valid) {
+         printf("\n---- This store has been validated %d\n", io.emit_validated_st.bits.rob_idx)
+      }
+   |
    //-------------------------------------------------------------
    // Kill speculated entries on branch mispredict
    //-------------------------------------------------------------
