@@ -262,9 +262,10 @@ class RenameStage(
          }
          .otherwise
          {
+            printf("\nRajasUse\n")
             when (r_valids(w) && ren2_will_fire(w))
             {
-               printf("\nUse this\n")
+               printf("\nRajasUse this\n")
             }
             r_valids(w) := r_valids(w) && !ren2_will_fire(w) // clear bit if uop gets dispatched
             r_uops(w) := GetNewUopAndBrMask(r_uops(w), io.brinfo)
