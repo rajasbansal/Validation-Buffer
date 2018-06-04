@@ -265,9 +265,13 @@ class RenameStage(
             r_valids(w) := r_valids(w) && !ren2_will_fire(w) // clear bit if uop gets dispatched
             r_uops(w) := GetNewUopAndBrMask(r_uops(w), io.brinfo)
          }
-
          ren2_valids(w) := r_valids(w)
          ren2_uops  (w) := r_uops(w)
+         //don't need the ren2_vals(w)--- Also we may leak registers when there is a kill signals
+         ifreelist.io.pending_readers(w).valid := ren2_will_fire(w) && ren2_valids(w)
+         ifreelist.io.pending_readers(w).bits  := ren2_uops(w)
+         ffreelist.io.pending_readers(w).valid := ren2_will_fire(w) && ren2_valids(w)
+         ffreelist.io.pending_readers(w).bits  := ren2_uops(w)
       }
    }
 

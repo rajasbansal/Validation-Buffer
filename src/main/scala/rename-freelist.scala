@@ -39,6 +39,10 @@ class FreeListIo(num_phys_registers: Int, pl_width: Int)(implicit p: Parameters)
    val rollback_wens  = Vec(pl_width, Bool()).asInput
    val rollback_pdsts = Vec(pl_width, UInt(width=preg_sz)).asInput
 
+   // Update the pending readers
+   val pending_readers_vals  = Vec(3*pl_width, Bool()).asInput
+   val pending_readers_regs  = Vec(3*pl_width, UInt(width=preg_sz)).asInput
+
    // or...
    // TODO there are TWO free-list IOs now, based on constants. What is the best way to handle these two designs?
    // perhaps freelist.scala, and instantiate which-ever one I want?
@@ -74,6 +78,9 @@ class RenameFreeListHelper(
 
    // ** FREE LIST TABLE ** //
    val free_list = Reg(init=(~Bits(1,num_phys_registers)))
+
+   // ** PENDING READERS LIST TABLE (CHECK WIDTH OF READERS) ** //
+   val pending_readers_list = Reg(init=Vec(num_phys_registers, UInt(0,8)))
 
    // track all allocations that have occurred since branch passed by
    // can quickly reset pipeline on branch mispredict
@@ -120,6 +127,14 @@ class RenameFreeListHelper(
       requested_pregs(w) := PriorityEncoder(requested_pregs_oh(w))
    }
 
+   //Update the pending readers
+   for (w <- 0 until 3*pl_width)
+   {
+      when (io.pending_readers_vals(w))
+      {
+      	pending_readers_list(io.pending_readers_regs(w)) := WrapInc(pending_readers_list(io.pending_readers_regs(w)),256)
+      }
+   }
 
    // ------------------------------------------
    // Calculate next Free List
@@ -267,6 +282,9 @@ class RenameFreeList(
 
       val flush_pipeline   = Bool(INPUT)
 
+      //Update the pending readers
+      val pending_readers  = Vec(pl_width, new ValidIO(new MicroOp())).asInput
+
       // Outputs
       val can_allocate     = Vec(pl_width, Bool()).asOutput
       val req_pregs        = Vec(pl_width, UInt(width=preg_sz)).asOutput
@@ -315,6 +333,14 @@ class RenameFreeList(
       } else {
          io.req_pregs(w) := freelist.io.req_pregs(w)
       }
+      // Should I add the logic for 0 as the register being read
+      freelist.io.pending_readers_vals(w)           := io.pending_readers(w).valid && (io.pending_readers(w).bits.lrs1_rtype == UInt(rtype))
+      freelist.io.pending_readers_vals(w+pl_width)  := io.pending_readers(w).valid && (io.pending_readers(w).bits.lrs2_rtype == UInt(rtype))
+      freelist.io.pending_readers_vals(w+2*pl_width):= io.pending_readers(w).valid && (io.pending_readers(w).bits.frs3_en) 
+      
+      freelist.io.pending_readers_regs(w)           := io.pending_readers(w).bits.pop1
+      freelist.io.pending_readers_regs(w+pl_width)  := io.pending_readers(w).bits.pop2
+      freelist.io.pending_readers_regs(w+2*pl_width):= io.pending_readers(w).bits.pop3
    }
 
    io.can_allocate := freelist.io.can_allocate
