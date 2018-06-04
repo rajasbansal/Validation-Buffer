@@ -334,8 +334,8 @@ class RenameFreeList(
          io.req_pregs(w) := freelist.io.req_pregs(w)
       }
       // Should I add the logic for 0 as the register being read
-      freelist.io.pending_readers_vals(w)           := io.pending_readers(w).valid && (io.pending_readers(w).bits.lrs1_rtype == UInt(rtype))
-      freelist.io.pending_readers_vals(w+pl_width)  := io.pending_readers(w).valid && (io.pending_readers(w).bits.lrs2_rtype == UInt(rtype))
+      freelist.io.pending_readers_vals(w)           := io.pending_readers(w).valid && (io.pending_readers(w).bits.lrs1_rtype === UInt(rtype))
+      freelist.io.pending_readers_vals(w+pl_width)  := io.pending_readers(w).valid && (io.pending_readers(w).bits.lrs2_rtype === UInt(rtype))
       freelist.io.pending_readers_vals(w+2*pl_width):= io.pending_readers(w).valid && (io.pending_readers(w).bits.frs3_en) 
       
       freelist.io.pending_readers_regs(w)           := io.pending_readers(w).bits.pop1
