@@ -132,8 +132,8 @@ class RenameFreeListHelper(
    {
       when (io.pending_readers_vals(w))
       {
-      	printf("Increasing the pending readers of %d with value %d\n", io.pending_readers_regs(w), pending_readers_list(io.pending_readers_regs(w)))
       	pending_readers_list(io.pending_readers_regs(w)) := WrapInc(pending_readers_list(io.pending_readers_regs(w)),256)
+      	printf("Increasing the pending readers of %d with value %d\n", io.pending_readers_regs(w), pending_readers_list(io.pending_readers_regs(w)))
       }
    }
 
@@ -342,6 +342,19 @@ class RenameFreeList(
       freelist.io.pending_readers_regs(w)           := io.pending_readers(w).bits.pop1
       freelist.io.pending_readers_regs(w+pl_width)  := io.pending_readers(w).bits.pop2
       freelist.io.pending_readers_regs(w+2*pl_width):= io.pending_readers(w).bits.pop3
+
+      when (io.pending_readers(w).valid && (io.pending_readers(w).bits.lrs1_rtype === UInt(rtype)))
+      {
+      	printf("RegisterSource1 is %d for [DASM(%x)]\n",io.pending_readers(w).bits.pop1,io.pending_readers(w).bits.inst)
+      }
+   	when (io.pending_readers(w).valid && (io.pending_readers(w).bits.lrs2_rtype === UInt(rtype)))
+      {
+      	printf("RegisterSource2 is %d for [DASM(%x)]\n",io.pending_readers(w).bits.pop2,io.pending_readers(w).bits.inst)
+      }
+   	when (io.pending_readers(w).valid && (io.pending_readers(w).bits.frs3_en))
+      {
+      	printf("RegisterSource3 is %d for [DASM(%x)]\n",io.pending_readers(w).bits.pop3,io.pending_readers(w).bits.inst)
+      }
    }
 
    io.can_allocate := freelist.io.can_allocate
