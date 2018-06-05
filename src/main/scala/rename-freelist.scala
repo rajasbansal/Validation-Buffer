@@ -147,7 +147,7 @@ class RenameFreeListHelper(
        //      }
        //   }
          // pending_readers_list(io.pending_readers_regs(w)) := pending_readers_list(io.pending_readers_regs(w)) + templist.reduce(_+_)
-         pending_readers_list(io.pending_readers_regs(w)) := pending_readers_list(io.pending_readers_regs(w)) + (io.pending_readers_regs).count({case (v) => ((v === io.pending_readers_regs(w)))})
+         pending_readers_list(io.pending_readers_regs(w)) := pending_readers_list(io.pending_readers_regs(w)) + (io.pending_readers_regs zip io.pending_readers_regs).count({case (v,val_bit) => ((v === io.pending_readers_regs(w)))})
          printf("Increasing the pending readers of %d with value %d\n", io.pending_readers_regs(w), pending_readers_list(io.pending_readers_regs(w)))
       }
    }
