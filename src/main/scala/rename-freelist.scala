@@ -132,7 +132,8 @@ class RenameFreeListHelper(
    {
       when (io.pending_readers_vals(w))
       {
-      	pending_readers_list(io.pending_readers_regs(w)) := WrapInc(pending_readers_list(io.pending_readers_regs(w)),256)
+      	// pending_readers_list(io.pending_readers_regs(w)) := WrapInc(pending_readers_list(io.pending_readers_regs(w)),256)
+      	pending_readers_list(io.pending_readers_regs(w)) := (io.pending_readers_regs map {case v => v === io.pending_readers_regs(w)}).count() + pending_readers_list(io.pending_readers_regs(w))
       	printf("Increasing the pending readers of %d with value %d\n", io.pending_readers_regs(w), pending_readers_list(io.pending_readers_regs(w)))
       }
    }
