@@ -133,7 +133,7 @@ class RenameFreeListHelper(
       when (io.pending_readers_vals(w))
       {
       	printf("Increasing the pending readers of %d with value %d\n", io.pending_readers_regs(w), pending_readers_list(io.pending_readers_regs(w)))
-      	//pending_readers_list(io.pending_readers_regs(w)) := WrapInc(pending_readers_list(io.pending_readers_regs(w)),256)
+      	pending_readers_list(io.pending_readers_regs(w)) := WrapInc(pending_readers_list(io.pending_readers_regs(w)),256)
       }
    }
 
