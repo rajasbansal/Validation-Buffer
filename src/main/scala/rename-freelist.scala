@@ -133,8 +133,22 @@ class RenameFreeListHelper(
       when (io.pending_readers_vals(w))
       {
       	// pending_readers_list(io.pending_readers_regs(w)) := WrapInc(pending_readers_list(io.pending_readers_regs(w)),256)
-      	pending_readers_list(io.pending_readers_regs(w)) := (io.pending_readers_regs map {case v => v === io.pending_readers_regs(w)}).count() + pending_readers_list(io.pending_readers_regs(w))
-      	printf("Increasing the pending readers of %d with value %d\n", io.pending_readers_regs(w), pending_readers_list(io.pending_readers_regs(w)))
+      	// pending_readers_list(io.pending_readers_regs(w)) := (io.pending_readers_regs map {case v => v === io.pending_readers_regs(w)}).count(_) + pending_readers_list(io.pending_readers_regs(w))
+      	// val templist = Vec(3*pl_width, UInt(0,log2Up(3*pl_width)))
+       //   for (i <- 0 until 3*pl_width)
+       //   {
+       //      when (io.pending_readers_regs(w) === io.pending_readers_regs(i))
+       //      {
+       //         templist(i) := 1.U
+       //      }
+       //      .otherwise
+       //      {
+       //         templist(i) := 0.U
+       //      }
+       //   }
+         // pending_readers_list(io.pending_readers_regs(w)) := pending_readers_list(io.pending_readers_regs(w)) + templist.reduce(_+_)
+         pending_readers_list(io.pending_readers_regs(w)) := pending_readers_list(io.pending_readers_regs(w)) + io.pending_readers_regs.count({case(v) => (v === io.pending_readers_regs(w))})
+         printf("Increasing the pending readers of %d with value %d\n", io.pending_readers_regs(w), pending_readers_list(io.pending_readers_regs(w)))
       }
    }
 
