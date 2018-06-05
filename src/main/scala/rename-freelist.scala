@@ -80,7 +80,7 @@ class RenameFreeListHelper(
    val free_list = Reg(init=(~Bits(1,num_phys_registers)))
 
    // ** PENDING READERS LIST TABLE (CHECK WIDTH OF READERS) ** //
-   val pending_readers_list = Reg(Vec(num_phys_registers, UInt(0,8)))
+   val pending_readers_list = Reg(Vec.fill(num_phys_registers){UInt(0,8)})
 
    // track all allocations that have occurred since branch passed by
    // can quickly reset pipeline on branch mispredict
