@@ -33,6 +33,8 @@ class RenameStageIO(
 {
    private val int_preg_sz = log2Up(num_int_pregs)
    private val fp_preg_sz = log2Up(num_fp_pregs)
+   private val size1 = issueParams.find(_.iqType == IQT_INT.litValue).get.issueWidth + issueParams.find(_.iqType == IQT_MEM.litValue).get.issueWidth
+   private val size2 = issueParams.find(_.iqType == IQT_FP.litValue).get.issueWidth
 
    val inst_can_proceed = Vec(pl_width, Bool()).asOutput
 
@@ -70,6 +72,10 @@ class RenameStageIO(
 
    val debug_rob_empty = Bool(INPUT)
    val debug = new DebugRenameStageIO(num_int_pregs, num_fp_pregs).asOutput
+
+   //Input from the read registers
+   val pending_done_1   = Vec(size1, new ValidIO(new MicroOp())).asInput
+   val pending_done_2   = Vec(size2, new ValidIO(new MicroOp())).asInput
 }
 
 
@@ -182,6 +188,8 @@ class RenameStage(
       list.io.com_rbk_valids := io.com_rbk_valids
       list.io.flush_pipeline := io.flush_pipeline
       list.io.debug_rob_empty := io.debug_rob_empty
+      list.io.pending_done_1 := io.pending_done_1
+      list.io.pending_done_2 := io.pending_done_2
    }
 
    for ((uop, w) <- ren1_uops.zipWithIndex)

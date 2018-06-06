@@ -409,6 +409,8 @@ class BoomCore(implicit p: Parameters, edge: uncore.tilelink2.TLEdgeOut) extends
 
    // TODO for now, assume worst-case all instructions will dispatch towards one issue unit.
    val dis_readys = issue_units.map(_.io.dis_readys.toBits).reduce(_&_) & fp_pipeline.io.dis_readys.toBits
+   rename_stage.io.pending_done_1 := iregister_read.io.pending_done
+   rename_stage.io.pending_done_2 := fppipeline.io.pending_done
    rename_stage.io.dis_inst_can_proceed := dis_readys.toBools
    rename_stage.io.ren_pred_info := Vec(dec_fbundle.uops.map(_.br_prediction))
 

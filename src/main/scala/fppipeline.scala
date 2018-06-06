@@ -49,6 +49,9 @@ class FpPipeline(implicit p: Parameters) extends BoomModule()(p)
 
       //TODO -- hook up commit log stuff.
       val debug_tsc_reg    = UInt(INPUT, xLen)
+
+      //The done of the registers
+      val pending_done = Vec(issue_unit.issue_width, new ValidIO(new MicroOp()))
    }
 
    //**********************************
@@ -73,7 +76,7 @@ class FpPipeline(implicit p: Parameters) extends BoomModule()(p)
                            exe_units.withFilter(_.uses_iss_unit).map(_.num_rf_read_ports),
                            exe_units.num_total_bypass_ports,
                            fLen+1))
-
+   io.pending_done := fregister_read.io.pending_done
    require (exe_units.withFilter(_.uses_iss_unit).map(x=>x).length == issue_unit.issue_width)
 
    // We're playing fast and loose on the number of wakeup and write ports.
