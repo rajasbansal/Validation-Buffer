@@ -140,8 +140,8 @@ class RegisterRead(
       idx += num_read_ports
 
       //Send signal to decrement their pending readers (if it had to be killed for whatever reason, for now we don't decrement the pending readers(we will have to do that later to not leak physical registers))
-      pending_done(w).valid := io.iss_valids(w) && !rrd_kill
-      pending_done(w).bits  := io.iss_uops(w)
+      io.pending_done(w).valid := io.iss_valids(w) && !rrd_kill
+      io.pending_done(w).bits  := io.iss_uops(w)
    }
 
 
