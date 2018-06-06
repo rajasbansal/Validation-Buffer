@@ -30,6 +30,9 @@ class RegisterReadIO(
    val iss_valids = Vec(issue_width, Bool()).asInput
    val iss_uops   = Vec(issue_width, new MicroOp()).asInput
 
+   // micrrops that have been read
+   val pending_done = Vec(issue_width, new ValidIO(new MicroOp()))
+
    // interface with register file's read ports
    val rf_read_ports = Vec(num_total_read_ports, new RegisterFileReadPortIO(PREG_SZ, register_width)).flip
 
@@ -127,7 +130,7 @@ class RegisterRead(
                      Mux(io.brinfo.valid && io.brinfo.mispredict
                                        , maskMatch(rrd_uops(w).br_mask, io.brinfo.mask)
                                        , Bool(false)))
-
+      
       exe_reg_valids(w) := Mux(rrd_kill, Bool(false), rrd_valids(w))
       // TODO use only the valids signal, don't require us to set nullUop
       exe_reg_uops(w)   := Mux(rrd_kill, NullMicroOp, rrd_uops(w))
@@ -135,6 +138,10 @@ class RegisterRead(
       exe_reg_uops(w).br_mask := GetNewBrMask(io.brinfo, rrd_uops(w))
 
       idx += num_read_ports
+
+      //Send signal to decrement their pending readers (if it had to be killed for whatever reason, for now we don't decrement the pending readers(we will have to do that later to not leak physical registers))
+      pending_done(w).valid := io.iss_valids(w) && !rrd_kill
+      pending_done(w).bits  := io.iss_uops(w)
    }
 
 

@@ -13,7 +13,7 @@ import Chisel._
 import config.Parameters
 
 
-class FreeListIo(num_phys_registers: Int, pl_width: Int)(implicit p: Parameters) extends BoomBundle()(p)
+class FreeListIo(num_phys_registers: Int, pl_width: Int, size1: Int, size2: Int)(implicit p: Parameters) extends BoomBundle()(p)
 {
    private val preg_sz = log2Up(num_phys_registers)
 
@@ -43,6 +43,10 @@ class FreeListIo(num_phys_registers: Int, pl_width: Int)(implicit p: Parameters)
    val pending_readers_vals  = Vec(3*pl_width, Bool()).asInput
    val pending_readers_regs  = Vec(3*pl_width, UInt(width=preg_sz)).asInput
 
+   // Decrement the pending readers
+   val done_readers_vals     = Vec((size1 + size2)*3, Bool()).asInput
+   val done_readers_regs     = Vec((size1 + size2)*3, UInt(width = preg_sz)).asInput
+
    // or...
    // TODO there are TWO free-list IOs now, based on constants. What is the best way to handle these two designs?
    // perhaps freelist.scala, and instantiate which-ever one I want?
@@ -71,10 +75,12 @@ class DebugFreeListIO(num_phys_registers: Int) extends Bundle
 // and the pipeline will give any reader of p0 0x0 as read data.
 class RenameFreeListHelper(
    num_phys_registers: Int, // number of physical registers
-   pl_width: Int)           // pipeline width ("dispatch group size")
+   pl_width: Int,           // pipeline width ("dispatch group size")
+   size1: Int,
+   size2: Int)           
    (implicit p: Parameters) extends BoomModule()(p)
 {
-   val io = new FreeListIo(num_phys_registers, pl_width)
+   val io = new FreeListIo(num_phys_registers, pl_width, size1, size2)
 
    // ** FREE LIST TABLE ** //
    val free_list = Reg(init=(~Bits(1,num_phys_registers)))
@@ -152,6 +158,14 @@ class RenameFreeListHelper(
       }
    }
 
+   for (w <- 0 until (size1 + size2)*3)
+   {
+      when (io.done_readers_vals(w))
+      {
+         pending_readers_list(io.done_readers_regs(w)) := pending_readers_list(io.done_readers_regs(w)) - Vec((io.done_readers_regs zip io.done_readers_vals) map {case (v,val_bit) => (v === io.done_readers_vals(w)) && val_bit}).count({case (v) => v})
+         printf("Decreasing the pending readers of %d with value %d\n", io.pending_readers_regs(w), pending_readers_list(io.pending_readers_regs(w)))
+      }
+   }
    // ------------------------------------------
    // Calculate next Free List
    val req_free_list = Wire(Bits(width = num_phys_registers))
@@ -279,7 +293,8 @@ class RenameFreeList(
    (implicit p: Parameters) extends BoomModule()(p)
 {
    private val preg_sz = log2Up(num_phys_registers)
-
+   val size1 = issueParams.find(_.iqType == IQT_INT.litValue).get.issueWidth + issueParams.find(_.iqType == IQT_MEM.litValue).get.issueWidth
+   val size2 = issueParams.find(_.iqType == IQT_FP.litValue).get.issueWidth
    val io = new Bundle
    {
       // Inputs
@@ -301,6 +316,10 @@ class RenameFreeList(
       //Update the pending readers
       val pending_readers  = Vec(pl_width, new ValidIO(new MicroOp())).asInput
 
+      //Decrement the registers which have been read
+      val pending_done_1   = Vec(size1, new ValidIO(new MicroOp())).asInput
+      val pending_done_2   = Vec(size2, new ValidIO(new MicroOp())).asInput
+
       // Outputs
       val can_allocate     = Vec(pl_width, Bool()).asOutput
       val req_pregs        = Vec(pl_width, UInt(width=preg_sz)).asOutput
@@ -311,7 +330,7 @@ class RenameFreeList(
 
    val freelist = Module(new RenameFreeListHelper(
       num_phys_registers,
-      pl_width))
+      pl_width, size1, size2))
 
    freelist.io.br_mispredict_val := io.brinfo.mispredict
    freelist.io.br_mispredict_tag := io.brinfo.tag
@@ -374,6 +393,26 @@ class RenameFreeList(
       {
       	printf("Pass Through Register is %d for [DASM(%x)]\n",io.pending_readers(w).bits.pop1,io.pending_readers(w).bits.inst)
       }
+   }
+
+   for (w <- 0 until size1)
+   {
+      freelist.io.done_readers_vals(w)                       := io.pending_done_1(w).valid && (io.pending_done_1(w).bits.lrs1_rtype === UInt(rtype))
+      freelist.io.done_readers_vals(w + size1 + size2)       := io.pending_done_1(w).valid && (io.pending_done_1(w).bits.lrs2_rtype === UInt(rtype))
+      freelist.io.done_readers_vals(w + (size1 + size2) * 2) := io.pending_done_1(w).valid && (io.pending_done_1(w).bits.frs3_en)
+      freelist.io.done_readers_regs(w)                       := io.pending_done_1(w).bits.pop1
+      freelist.io.done_readers_regs(w + size1 + size2)       := io.pending_done_1(w).bits.pop2
+      freelist.io.done_readers_regs(w + (size1 + size2) * 2) := io.pending_done_1(w).bits.pop3
+   }
+
+   for (w <- 0 until size2)
+   {
+      freelist.io.done_readers_vals(size1 + w)                       := io.pending_done_1(w).valid && (io.pending_done_1(w).bits.lrs1_rtype === UInt(rtype))
+      freelist.io.done_readers_vals(size1 + w + size1 + size2)       := io.pending_done_1(w).valid && (io.pending_done_1(w).bits.lrs2_rtype === UInt(rtype))
+      freelist.io.done_readers_vals(size1 + w + (size1 + size2) * 2) := io.pending_done_1(w).valid && (io.pending_done_1(w).bits.frs3_en)
+      freelist.io.done_readers_regs(size1 + w)                       := io.pending_done_1(w).bits.pop1
+      freelist.io.done_readers_regs(size1 + w + size1 + size2)       := io.pending_done_1(w).bits.pop2
+      freelist.io.done_readers_regs(size1 + w + (size1 + size2) * 2) := io.pending_done_1(w).bits.pop3
    }
 
    io.can_allocate := freelist.io.can_allocate
