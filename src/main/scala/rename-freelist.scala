@@ -425,18 +425,18 @@ class RenameFreeList(
       freelist.io.done_readers_regs(size1 + w)                       := io.pending_done_2(w).bits.pop1
       freelist.io.done_readers_regs(size1 + w + size1 + size2)       := io.pending_done_2(w).bits.pop2
       freelist.io.done_readers_regs(size1 + w + (size1 + size2) * 2) := io.pending_done_2(w).bits.pop3
-      when (io.pending_done_1(size1 + w).valid && (io.pending_done_1(size1 + w).bits.lrs1_rtype === UInt(rtype)))
-      {
-         printf("Decrement register1 %d for [DASM(%x)]\n",io.pending_done_1(size1 + w).bits.pop1,io.pending_done_1(size1 + w).bits.inst)
-      }
-      when (io.pending_done_1(size1 + w).valid && (io.pending_done_1(size1 + w).bits.lrs2_rtype === UInt(rtype)))
-      {
-         printf("Decrement register2 %d for [DASM(%x)]\n",io.pending_done_1(size1 + w).bits.pop2,io.pending_done_1(size1 + w).bits.inst)
-      }
-      when (io.pending_done_1(size1 + w).valid && (io.pending_done_1(size1 + w).bits.frs3_en))
-      {
-         printf("Decrement register3 %d for [DASM(%x)]\n",io.pending_done_1(size1 + w).bits.pop3,io.pending_done_1(size1 + w).bits.inst)
-      }
+      // when (io.pending_done_2(w).valid && (io.pending_done_2(w).bits.lrs1_rtype === UInt(rtype)))
+      // {
+      //    printf("Decrement register1 %d for [DASM(%x)]\n",io.pending_done_2(w).bits.pop1,io.pending_done_2(w).bits.inst)
+      // }
+      // when (io.pending_done_2(w).valid && (io.pending_done_2(w).bits.lrs2_rtype === UInt(rtype)))
+      // {
+      //    printf("Decrement register2 %d for [DASM(%x)]\n",io.pending_done_2(w).bits.pop2,io.pending_done_2(w).bits.inst)
+      // }
+      // when (io.pending_done_2(w).valid && (io.pending_done_2(w).bits.frs3_en))
+      // {
+      //    printf("Decrement register3 %d for [DASM(%x)]\n",io.pending_done_2(w).bits.pop3,io.pending_done_2(w).bits.inst)
+      // }
    }
 
    io.can_allocate := freelist.io.can_allocate
