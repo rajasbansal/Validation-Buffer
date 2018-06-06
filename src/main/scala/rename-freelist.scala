@@ -370,6 +370,10 @@ class RenameFreeList(
       {
       	printf("RegisterSource3 is %d for [DASM(%x)]\n",io.pending_readers(w).bits.pop3,io.pending_readers(w).bits.inst)
       }
+   	when (io.pending_readers(w).valid && (io.pending_readers(w).bits.lrs1_rtype === RT_PAS))
+      {
+      	printf("Pass Through Register is %d for [DASM(%x)]\n",io.pending_readers(w).bits.pop1,io.pending_readers(w).bits.inst)
+      }
    }
 
    io.can_allocate := freelist.io.can_allocate
