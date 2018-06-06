@@ -26,7 +26,7 @@ class FpPipeline(implicit p: Parameters) extends BoomModule()(p)
    val num_ll_ports = 1 // hard-wired; used by mem port and i2f port.
    val num_wakeup_ports = fpIssueParams.issueWidth + num_ll_ports
    val fp_preg_sz = log2Up(numFpPhysRegs)
-
+   val size2 = issueParams.find(_.iqType == IQT_FP.litValue).get.issueWidth
    val io = new Bundle
    {
       val brinfo           = new BrResolutionInfo().asInput
@@ -51,7 +51,7 @@ class FpPipeline(implicit p: Parameters) extends BoomModule()(p)
       val debug_tsc_reg    = UInt(INPUT, xLen)
 
       //The done of the registers
-      val pending_done = Vec(issue_unit.issue_width, new ValidIO(new MicroOp()))
+      val pending_done = Vec(size2, new ValidIO(new MicroOp()))
    }
 
    //**********************************
