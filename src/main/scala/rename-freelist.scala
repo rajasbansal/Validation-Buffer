@@ -169,7 +169,7 @@ class RenameFreeListHelper(
    for (i <- 0 until num_phys_registers)
    {
       pending_readers_list(i) := ((pending_readers_list(i)) + (Vec((io.pending_readers_regs zip io.pending_readers_vals) map {case (v,val_bit) => (v === pending_readers_list(i)) && val_bit}).count({case (v) => v})) - (Vec((io.done_readers_regs zip io.done_readers_vals) map {case (v,val_bit) => (v === pending_readers_list(i)) && val_bit}).count({case (v) => v})))
-      printf("%d- Add %d Subtract %d\n",i,Vec((io.pending_readers_regs zip io.pending_readers_vals) map {case (v,val_bit) => (v === pending_readers_list(i)) && val_bit}).count({case (v) => v}),Vec((io.done_readers_regs zip io.done_readers_vals) map {case (v,val_bit) => (v === pending_readers_list(i)) && val_bit}).count({case (v) => v}))
+      printf("%i- Add %d Subtract %d\n",i,Vec((io.pending_readers_regs zip io.pending_readers_vals) map {case (v,val_bit) => (v === pending_readers_list(i)) && val_bit}).count({case (v) => v}),Vec((io.done_readers_regs zip io.done_readers_vals) map {case (v,val_bit) => (v === pending_readers_list(i)) && val_bit}).count({case (v) => v}))
    }
    // ------------------------------------------
    // Calculate next Free List
