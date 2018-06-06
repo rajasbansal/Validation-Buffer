@@ -133,7 +133,7 @@ class RenameFreeListHelper(
       requested_pregs(w) := PriorityEncoder(requested_pregs_oh(w))
    }
 
-   Update the pending readers
+   // Update the pending readers
    for (w <- 0 until 3*pl_width)
    {
       when (io.pending_readers_vals(w))
