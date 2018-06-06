@@ -554,6 +554,7 @@ class Rob(width: Int,
          //kill instruction if mispredict & br mask match
          when (io.brinfo.valid && io.brinfo.mispredict && entry_match)
          {
+            printf("Mispredict\n")
             rob_val(i) := Bool(false)
             rob_uop(UInt(i)).inst := BUBBLE
          }
