@@ -153,7 +153,7 @@ class RenameFreeListHelper(
        //      }
        //   }
          // pending_readers_list(io.pending_readers_regs(w)) := pending_readers_list(io.pending_readers_regs(w)) + templist.reduce(_+_)
-         pending_readers_list(io.pending_readers_regs(w)) := pending_readers_list(io.pending_readers_regs(w)) + Vec((io.pending_readers_regs zip io.pending_readers_vals) map {case (v,val_bit) => (v === io.pending_readers_regs(w)) && val_bit}).count({case (v) => v})
+         pending_readers_list(io.pending_readers_regs(w)) := pending_readers_list(io.pending_readers_regs(w)) + Vec((io.pending_readers_regs zip io.pending_readers_vals) map {case (v,val_bit) => (v === io.pending_readers_regs(w)) && val_bit}).count({case (v) => v}) - Vec((io.done_readers_regs zip io.done_readers_vals) map {case (v,val_bit) => (v === io.pending_readers_regs(w)) && val_bit}).count({case (v) => v})
          printf("Increasing the pending readers of %d with value %d\n", io.pending_readers_regs(w), pending_readers_list(io.pending_readers_regs(w)))
       }
    }
@@ -162,7 +162,7 @@ class RenameFreeListHelper(
    {
       when (io.done_readers_vals(w))
       {
-         pending_readers_list(io.done_readers_regs(w)) := pending_readers_list(io.done_readers_regs(w)) - Vec((io.done_readers_regs zip io.done_readers_vals) map {case (v,val_bit) => (v === io.done_readers_vals(w)) && val_bit}).count({case (v) => v})
+         pending_readers_list(io.done_readers_regs(w)) := pending_readers_list(io.done_readers_regs(w)) + Vec((io.pending_readers_regs zip io.pending_readers_vals) map {case (v,val_bit) => (v === io.done_readers_regs(w)) && val_bit}).count({case (v) => v}) - Vec((io.done_readers_regs zip io.done_readers_vals) map {case (v,val_bit) => (v === io.done_readers_vals(w)) && val_bit}).count({case (v) => v})
          printf("Decreasing the pending readers of %d with value %d\n", io.done_readers_regs(w), pending_readers_list(io.done_readers_regs(w)))
       }
    }
@@ -403,6 +403,18 @@ class RenameFreeList(
       freelist.io.done_readers_regs(w)                       := io.pending_done_1(w).bits.pop1
       freelist.io.done_readers_regs(w + size1 + size2)       := io.pending_done_1(w).bits.pop2
       freelist.io.done_readers_regs(w + (size1 + size2) * 2) := io.pending_done_1(w).bits.pop3
+      when (io.pending_done_1(w).valid && (io.pending_done_1(w).bits.lrs1_rtype === UInt(rtype)))
+      {
+         printf("Decrement register1 %d for [DASM(%x)]\n",io.pending_done_1(w).bits.pop1,io.pending_done_1(w).bits.inst)
+      }
+      when (io.pending_done_1(w).valid && (io.pending_done_1(w).bits.lrs2_rtype === UInt(rtype)))
+      {
+         printf("Decrement register2 %d for [DASM(%x)]\n",io.pending_done_1(w).bits.pop2,io.pending_done_1(w).bits.inst)
+      }
+      when (io.pending_done_1(w).valid && (io.pending_done_1(w).bits.frs3_en))
+      {
+         printf("Decrement register3 %d for [DASM(%x)]\n",io.pending_done_1(w).bits.pop3,io.pending_done_1(w).bits.inst)
+      }
    }
 
    for (w <- 0 until size2)
@@ -413,6 +425,18 @@ class RenameFreeList(
       freelist.io.done_readers_regs(size1 + w)                       := io.pending_done_1(w).bits.pop1
       freelist.io.done_readers_regs(size1 + w + size1 + size2)       := io.pending_done_1(w).bits.pop2
       freelist.io.done_readers_regs(size1 + w + (size1 + size2) * 2) := io.pending_done_1(w).bits.pop3
+      when (io.pending_done_1(size1 + w).valid && (io.pending_done_1(size1 + w).bits.lrs1_rtype === UInt(rtype)))
+      {
+         printf("Decrement register1 %d for [DASM(%x)]\n",io.pending_done_1(size1 + w).bits.pop1,io.pending_done_1(size1 + w).bits.inst)
+      }
+      when (io.pending_done_1(size1 + w).valid && (io.pending_done_1(size1 + w).bits.lrs2_rtype === UInt(rtype)))
+      {
+         printf("Decrement register2 %d for [DASM(%x)]\n",io.pending_done_1(size1 + w).bits.pop2,io.pending_done_1(size1 + w).bits.inst)
+      }
+      when (io.pending_done_1(size1 + w).valid && (io.pending_done_1(size1 + w).bits.frs3_en))
+      {
+         printf("Decrement register3 %d for [DASM(%x)]\n",io.pending_done_1(size1 + w).bits.pop3,io.pending_done_1(size1 + w).bits.inst)
+      }
    }
 
    io.can_allocate := freelist.io.can_allocate
