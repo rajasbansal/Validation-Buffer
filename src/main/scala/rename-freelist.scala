@@ -133,7 +133,7 @@ class RenameFreeListHelper(
       requested_pregs(w) := PriorityEncoder(requested_pregs_oh(w))
    }
 
-   //Update the pending readers
+   Update the pending readers
    for (w <- 0 until 3*pl_width)
    {
       when (io.pending_readers_vals(w))
@@ -153,7 +153,7 @@ class RenameFreeListHelper(
        //      }
        //   }
          // pending_readers_list(io.pending_readers_regs(w)) := pending_readers_list(io.pending_readers_regs(w)) + templist.reduce(_+_)
-         pending_readers_list(io.pending_readers_regs(w)) := pending_readers_list(io.pending_readers_regs(w)) + Vec((io.pending_readers_regs zip io.pending_readers_vals) map {case (v,val_bit) => (v === io.pending_readers_regs(w)) && val_bit}).count({case (v) => v}) - Vec((io.done_readers_regs zip io.done_readers_vals) map {case (v,val_bit) => (v === io.pending_readers_regs(w)) && val_bit}).count({case (v) => v})
+         // pending_readers_list(io.pending_readers_regs(w)) := pending_readers_list(io.pending_readers_regs(w)) + Vec((io.pending_readers_regs zip io.pending_readers_vals) map {case (v,val_bit) => (v === io.pending_readers_regs(w)) && val_bit}).count({case (v) => v}) - Vec((io.done_readers_regs zip io.done_readers_vals) map {case (v,val_bit) => (v === io.pending_readers_regs(w)) && val_bit}).count({case (v) => v})
          printf("Increasing the pending readers of %d with value %d\n", io.pending_readers_regs(w), pending_readers_list(io.pending_readers_regs(w)))
       }
    }
@@ -162,9 +162,13 @@ class RenameFreeListHelper(
    {
       when (io.done_readers_vals(w))
       {
-         pending_readers_list(io.done_readers_regs(w)) := pending_readers_list(io.done_readers_regs(w)) + Vec((io.pending_readers_regs zip io.pending_readers_vals) map {case (v,val_bit) => (v === io.done_readers_regs(w)) && val_bit}).count({case (v) => v}) - Vec((io.done_readers_regs zip io.done_readers_vals) map {case (v,val_bit) => (v === io.done_readers_vals(w)) && val_bit}).count({case (v) => v})
+         // pending_readers_list(io.done_readers_regs(w)) := pending_readers_list(io.done_readers_regs(w)) + Vec((io.pending_readers_regs zip io.pending_readers_vals) map {case (v,val_bit) => (v === io.done_readers_regs(w)) && val_bit}).count({case (v) => v}) - Vec((io.done_readers_regs zip io.done_readers_vals) map {case (v,val_bit) => (v === io.done_readers_vals(w)) && val_bit}).count({case (v) => v})
          printf("Decreasing the pending readers of %d with value %d\n", io.done_readers_regs(w), pending_readers_list(io.done_readers_regs(w)))
       }
+   }
+   for (i <- 0 until num_phys_registers)
+   {
+      pending_readers_list(i) := pending_readers_list(i) + Vec((io.pending_readers_regs zip io.pending_readers_vals) map {case (v,val_bit) => (v === pending_readers_list(i)) && val_bit}).count({case (v) => v}) - Vec((io.done_readers_regs zip io.done_readers_vals) map {case (v,val_bit) => (v === pending_readers_list(i)) && val_bit}).count({case (v) => v})
    }
    // ------------------------------------------
    // Calculate next Free List
