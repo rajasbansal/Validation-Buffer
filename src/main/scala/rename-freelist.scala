@@ -88,6 +88,9 @@ class RenameFreeListHelper(
    // ** PENDING READERS LIST TABLE (CHECK WIDTH OF READERS) ** //
    val pending_readers_list = Reg(init = Vec.fill(num_phys_registers){UInt(0,8)})
 
+   // ** VALID-REMAPPING LIST TABLE ** //
+   val valid_remapping_list = Reg(init = ~Bits(0,num_phys_registers))
+
    // track all allocations that have occurred since branch passed by
    // can quickly reset pipeline on branch mispredict
    val allocation_lists = Reg(Vec(MAX_BR_COUNT, Bits(width = num_phys_registers)))
@@ -99,8 +102,8 @@ class RenameFreeListHelper(
    // find new,free physical registers
 
    val requested_pregs_oh_array = Array.fill(pl_width,num_phys_registers){Bool(false)}
-   val requested_pregs_oh       = Wire(Vec(pl_width, Bits(width=num_phys_registers)))
-   val requested_pregs          = Wire(Vec(pl_width, UInt(width=log2Up(num_phys_registers))))
+   val requested_pregs_oh       = Wire(Vec(pl_width, Bits(0,num_phys_registers)))
+   val requested_pregs          = Wire(Vec(pl_width, UInt(0,log2Up(num_phys_registers))))
    var allocated                = Wire(Vec(pl_width, Bool())) // did each inst get allocated a register?
 
    // init
@@ -132,7 +135,7 @@ class RenameFreeListHelper(
       requested_pregs_oh(w) := Vec(requested_pregs_oh_array(w)).toBits
       requested_pregs(w) := PriorityEncoder(requested_pregs_oh(w))
    }
-
+   
    // Update the pending readers
    for (w <- 0 until 3*pl_width)
    {
@@ -206,6 +209,8 @@ class RenameFreeListHelper(
       just_allocated_mask = Mux(io.req_preg_vals(w) && allocated(w), requested_pregs_oh(w) | just_allocated_mask,
                                                                      just_allocated_mask)
    }
+   // Considering no misprediction
+   valid_remapping_list := (valid_remapping_list | enq_mask.reduce(_|_))  & (~ just_allocated_mask)
 
    for (i <- 0 until MAX_BR_COUNT)
    {
