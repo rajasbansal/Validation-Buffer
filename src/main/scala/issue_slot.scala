@@ -182,18 +182,21 @@ class IssueSlot(num_slow_wakeup_ports: Int)(implicit p: Parameters) extends Boom
 
    // was this micro-op killed by a branch? if yes, we can't let it be valid if
    // we compact it into an other entry
+   wasKilled := Bool(false)
    when (IsKilledByBranch(io.brinfo, slotUop))
    {
       updated_state := s_invalid
+      when (isValid)
+      {
+         wasKilled := Bool(true)
+         printf("There was a mispredict for DASM(%x) with r1 as %d and r2 as %d\n",slotUop.inst,slotUop.pop1, slotUop.pop2)
+      }
    }
-   wasKilled := Bool(false)
+   io.killed_by_branch := wasKilled
    when (!io.in_uop.valid)
    {
       slotUop.br_mask := out_br_mask
-      wasKilled := Bool(true)
-      printf("There was a mispredict for DASM(%x) with r1 as %d and r2 as %d",slotUop.inst,slotUop.pop1, slotUop.pop2)
    }
-   io.killed_by_branch := wasKilled
 
    //-------------------------------------------------------------
    // Request Logic
