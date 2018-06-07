@@ -191,6 +191,7 @@ class IssueSlot(num_slow_wakeup_ports: Int)(implicit p: Parameters) extends Boom
    {
       slotUop.br_mask := out_br_mask
       wasKilled := Bool(true)
+      printf("There was a mispredict for DASM(%x) with r1 as %d and r2 as %d",slotUop.inst,slotUop.pop1, slotUop.pop2)
    }
    io.killed_by_branch := wasKilled
 
