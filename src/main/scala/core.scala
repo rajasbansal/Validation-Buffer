@@ -516,6 +516,11 @@ class BoomCore(implicit p: Parameters, edge: uncore.tilelink2.TLEdgeOut) extends
          iu.io.dis_uops(w).prs2_busy := Bool(false)
       }
    }
+   
+   //Hardcoded for only two issue units (integer and memory)
+   rename_stage.io.mis_mem := issue_units(0).io.mispredicted_uops
+   rename_stage.io.mis_int := issue_units(1).io.mispredicted_uops
+   rename_stage.io.mis_fp  := fp_pipeline.io.mispredicted_uops
 
    fp_pipeline.io.dis_valids <> dis_valids
    fp_pipeline.io.dis_uops <> dis_uops

@@ -28,7 +28,8 @@ class RenameStageIO(
    num_int_pregs: Int,
    num_fp_pregs: Int,
    num_int_wb_ports: Int,
-   num_fp_wb_ports: Int)
+   num_fp_wb_ports: Int,
+   num_issue_slots: Int)
    (implicit p: Parameters) extends BoomBundle()(p)
 {
    private val int_preg_sz = log2Up(num_int_pregs)
@@ -76,6 +77,11 @@ class RenameStageIO(
    //Input from the read registers
    val pending_done_1   = Vec(size1, new ValidIO(new MicroOp())).asInput
    val pending_done_2   = Vec(size2, new ValidIO(new MicroOp())).asInput
+
+   //Input for the misprediction
+   val mis_int          = Vec(num_issue_slots, new ValidIO(new MicroOp())).asInput
+   val mis_mem          = Vec(num_issue_slots, new ValidIO(new MicroOp())).asInput
+   val mis_fp           = Vec(num_issue_slots, new ValidIO(new MicroOp())).asInput
 }
 
 
@@ -97,7 +103,7 @@ class RenameStage(
    num_fp_wb_ports: Int)
 (implicit p: Parameters) extends BoomModule()(p)
 {
-   val io = new RenameStageIO(pl_width, numIntPhysRegs, numFpPhysRegs, num_int_wb_ports, num_fp_wb_ports)
+   val io = new RenameStageIO(pl_width, numIntPhysRegs, numFpPhysRegs, num_int_wb_ports, num_fp_wb_ports, 20)
 
    // integer registers
    val imaptable = Module(new RenameMapTable(
@@ -190,6 +196,9 @@ class RenameStage(
       list.io.debug_rob_empty := io.debug_rob_empty
       list.io.pending_done_1 := io.pending_done_1
       list.io.pending_done_2 := io.pending_done_2
+      list.io.mis_fp         := io.mis_fp
+      list.io.mis_int        := io.mis_int
+      list.io.mis_mem        := io.mis_mem
    }
 
    for ((uop, w) <- ren1_uops.zipWithIndex)

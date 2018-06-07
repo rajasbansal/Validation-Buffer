@@ -26,7 +26,7 @@ case class IssueParams(
    iqType: BigInt
 )
 
-class IssueUnitIO(issue_width: Int, num_wakeup_ports: Int)(implicit p: Parameters) extends BoomBundle()(p)
+class IssueUnitIO(issue_width: Int, num_wakeup_ports: Int, num_issue_slots: Int)(implicit p: Parameters) extends BoomBundle()(p)
 {
    val dis_valids     = Vec(DISPATCH_WIDTH, Bool()).asInput
    val dis_uops       = Vec(DISPATCH_WIDTH, new MicroOp()).asInput
@@ -45,6 +45,8 @@ class IssueUnitIO(issue_width: Int, num_wakeup_ports: Int)(implicit p: Parameter
    val event_empty    = Bool(OUTPUT) // used by HPM events; is the issue unit empty?
 
    val tsc_reg        = UInt(INPUT, xLen)
+
+   val mispredicted_uops = Vec(num_issue_slots, new ValidIO(new MicroOp()))
 }
 
 abstract class IssueUnit(
@@ -55,7 +57,7 @@ abstract class IssueUnit(
    (implicit p: Parameters)
    extends BoomModule()(p)
 {
-   val io = new IssueUnitIO(issue_width, num_wakeup_ports)
+   val io = new IssueUnitIO(issue_width, num_wakeup_ports, num_issue_slots)
 
    //-------------------------------------------------------------
    // Set up the dispatch uops

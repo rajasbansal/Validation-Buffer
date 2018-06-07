@@ -52,6 +52,9 @@ class FpPipeline(implicit p: Parameters) extends BoomModule()(p)
 
       //The done of the registers
       val pending_done = Vec(size2, new ValidIO(new MicroOp()))
+
+      //Mispredicted uops which were removed
+      val mispredicted_uops = Vec(fpIssueParams.numEntries, new ValidIO(new MicroOp()))
    }
 
    //**********************************

@@ -142,6 +142,12 @@ class IssueUnitCollasping(
       }
    }
 
+   for (i <- 0 until num_issue_slots)
+   {
+      mispredicted_uops(i).valid := issue_slots(i).killed_by_branch
+      mispredicted_uops(i).bits  := issue_slots(i).uop
+   }
+
 }
 
 }

@@ -32,7 +32,7 @@ class IssueSlotIO(num_wakeup_ports: Int)(implicit p: Parameters) extends BoomBun
    val in_uop         = Valid(new MicroOp()).flip // if valid, this WILL overwrite an entry!
    val updated_uop    = new MicroOp().asOutput // the updated slot uop; will be shifted upwards in a collasping queue.
    val uop            = new MicroOp().asOutput // the current Slot's uop. Sent down the pipeline when issued.
-
+   val killed_by_branch = Bool(OUTPUT)
    val debug = {
      val result = new Bundle {
        val p1 = Bool()
@@ -62,7 +62,7 @@ class IssueSlot(num_slow_wakeup_ports: Int)(implicit p: Parameters) extends Boom
    val next_p1  = Wire(Bool())
    val next_p2  = Wire(Bool())
    val next_p3  = Wire(Bool())
-
+   val wasKilled= Wire(Bool())
    val slot_state    = Reg(init = s_invalid)
    val slot_p1       = Reg(init = Bool(false), next = next_p1)
    val slot_p2       = Reg(init = Bool(false), next = next_p2)
@@ -186,12 +186,13 @@ class IssueSlot(num_slow_wakeup_ports: Int)(implicit p: Parameters) extends Boom
    {
       updated_state := s_invalid
    }
-
+   wasKilled := Bool(false)
    when (!io.in_uop.valid)
    {
       slotUop.br_mask := out_br_mask
+      wasKilled := Bool(true)
    }
-
+   io.killed_by_branch := wasKilled
 
    //-------------------------------------------------------------
    // Request Logic

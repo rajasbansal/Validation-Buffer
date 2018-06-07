@@ -47,6 +47,14 @@ class FreeListIo(num_phys_registers: Int, pl_width: Int, size1: Int, size2: Int)
    val done_readers_vals     = Vec((size1 + size2)*3, Bool()).asInput
    val done_readers_regs     = Vec((size1 + size2)*3, UInt(width = preg_sz)).asInput
 
+   val mis_mem_vals          = Vec(60, Bool()).asInput
+   val mis_mem_regs          = Vec(60, UInt(width = preg_sz)).asInput
+
+   val mis_int_vals          = Vec(60, Bool()).asInput
+   val mis_int_regs          = Vec(60, UInt(width = preg_sz)).asInput
+
+   val mis_fp_vals           = Vec(60, Bool()).asInput
+   val mis_fp_regs           = Vec(60, UInt(width = preg_sz)).asInput
    // or...
    // TODO there are TWO free-list IOs now, based on constants. What is the best way to handle these two designs?
    // perhaps freelist.scala, and instantiate which-ever one I want?
@@ -333,6 +341,9 @@ class RenameFreeList(
       //Decrement the registers which have been read
       val pending_done_1   = Vec(size1, new ValidIO(new MicroOp())).asInput
       val pending_done_2   = Vec(size2, new ValidIO(new MicroOp())).asInput
+      val mis_int          = Vec(20, new ValidIO(new MicroOp())).asInput
+      val mis_mem          = Vec(20, new ValidIO(new MicroOp())).asInput
+      val mis_fp           = Vec(20, new ValidIO(new MicroOp())).asInput
 
       // Outputs
       val can_allocate     = Vec(pl_width, Bool()).asOutput
@@ -453,6 +464,35 @@ class RenameFreeList(
       }
    }
 
+   for (w <- 0 until 20)
+   {
+      freelist.io.mis_mem_vals(w)      := io.mis_mem(w).valid && (io.mis_mem(w).bits.lrs1_rtype === UInt(rtype))
+      freelist.io.mis_mem_vals(w + 20) := io.mis_mem(w).valid && (io.mis_mem(w).bits.lrs2_rtype === UInt(rtype))
+      freelist.io.mis_mem_vals(w + 40) := io.mis_mem(w).valid && (io.mis_mem(w).bits.frs3_en)
+      freelist.io.mis_mem_regs(w)      := io.mis_mem(w).bits.pop1
+      freelist.io.mis_mem_regs(w + 20) := io.mis_mem(w).bits.pop2
+      freelist.io.mis_mem_regs(w + 40) := io.mis_mem(w).bits.pop3
+   }
+
+   for (w <- 0 until 20)
+   {
+      freelist.io.mis_int_vals(w)      := io.mis_int(w).valid && (io.mis_int(w).bits.lrs1_rtype === UInt(rtype))
+      freelist.io.mis_int_vals(w + 20) := io.mis_int(w).valid && (io.mis_int(w).bits.lrs2_rtype === UInt(rtype))
+      freelist.io.mis_int_vals(w + 40) := io.mis_int(w).valid && (io.mis_int(w).bits.frs3_en)
+      freelist.io.mis_int_regs(w)      := io.mis_int(w).bits.pop1
+      freelist.io.mis_int_regs(w + 20) := io.mis_int(w).bits.pop2
+      freelist.io.mis_int_regs(w + 40) := io.mis_int(w).bits.pop3
+   }
+
+   for (w <- 0 until 20)
+   {
+      freelist.io.mis_fp_vals(w)      := io.mis_fp(w).valid && (io.mis_fp(w).bits.lrs1_rtype === UInt(rtype))
+      freelist.io.mis_fp_vals(w + 20) := io.mis_fp(w).valid && (io.mis_fp(w).bits.lrs2_rtype === UInt(rtype))
+      freelist.io.mis_fp_vals(w + 40) := io.mis_fp(w).valid && (io.mis_fp(w).bits.frs3_en)
+      freelist.io.mis_fp_regs(w)      := io.mis_fp(w).bits.pop1
+      freelist.io.mis_fp_regs(w + 20) := io.mis_fp(w).bits.pop2
+      freelist.io.mis_fp_regs(w + 40) := io.mis_fp(w).bits.pop3
+   }
    io.can_allocate := freelist.io.can_allocate
    io.debug := freelist.io.debug
 
