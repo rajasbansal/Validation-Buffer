@@ -190,7 +190,7 @@ class RenameFreeListHelper(
       }
       if (i==2||i==1||i==0)
       {
-         printf(i+"- Add %d Subtract %d\n",Vec((io.pending_readers_regs zip io.pending_readers_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v}),Vec((io.done_readers_regs zip io.done_readers_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v}))
+         printf(i+"- Add %d Subtract %d Mem %d Int %d FP %d\n",Vec((io.pending_readers_regs zip io.pending_readers_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v}),Vec((io.done_readers_regs zip io.done_readers_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v}),(Vec((io.mis_mem_regs zip io.mis_mem_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v})),(Vec((io.mis_int_regs zip io.mis_int_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v})),(Vec((io.mis_fp_regs zip io.mis_fp_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v})))
       }
       // printf(i+"- Add %d Subtract %d\n",Vec((io.pending_readers_regs zip io.pending_readers_vals) map {case (v,val_bit) => (v === i) && val_bit}).count({case (v) => v}),Vec((io.done_readers_regs zip io.done_readers_vals) map {case (v,val_bit) => (v === i) && val_bit}).count({case (v) => v}))
    }
