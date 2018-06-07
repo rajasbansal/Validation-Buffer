@@ -89,7 +89,7 @@ class RenameFreeListHelper(
    val pending_readers_list = Reg(init = Vec.fill(num_phys_registers){UInt(0,8)})
 
    // ** VALID-REMAPPING LIST TABLE ** //
-   val valid_remapping_list = Reg(init = ~Bits(0,num_phys_registers))
+   val valid_remapping_list = Reg(init = ~Bits(1,num_phys_registers))
 
    // track all allocations that have occurred since branch passed by
    // can quickly reset pipeline on branch mispredict
@@ -209,8 +209,6 @@ class RenameFreeListHelper(
       just_allocated_mask = Mux(io.req_preg_vals(w) && allocated(w), requested_pregs_oh(w) | just_allocated_mask,
                                                                      just_allocated_mask)
    }
-   // Considering no misprediction
-   valid_remapping_list := (valid_remapping_list | enq_mask.reduce(_|_))  & (~ just_allocated_mask)
 
    for (i <- 0 until MAX_BR_COUNT)
    {
@@ -240,6 +238,8 @@ class RenameFreeListHelper(
    when (!io.br_mispredict_val)
    {
       free_list := (free_list & ~(just_allocated_mask)) | (enq_mask.reduce(_|_))
+      // Considering no misprediction
+      valid_remapping_list := (valid_remapping_list & ~(just_allocated_mask)) | (enq_mask.reduce(_|_))
    }
 
    // Handle Misprediction
@@ -251,7 +251,7 @@ class RenameFreeListHelper(
    {
       // include newly freed register as well!
       free_list := allocation_list | free_list | (enq_mask.reduce(_|_))
-
+      valid_remapping_list := valid_remapping_list |  allocation_list | (enq_mask.reduce(_|_))
       // set other branch allocation_lists to zero where allocation_list(j) == 1...
       for (i <- 0 until MAX_BR_COUNT)
       {
