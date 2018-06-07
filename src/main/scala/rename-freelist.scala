@@ -179,15 +179,15 @@ class RenameFreeListHelper(
    }
    for (i <- 0 until num_phys_registers)
    {
-      when (!Reg(init=Bool(false), next = io.br_mispredict_val))
-      {
-         pending_readers_list(i) := ((pending_readers_list(i)) + (Vec((io.pending_readers_regs zip io.pending_readers_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v})) - (Vec((io.done_readers_regs zip io.done_readers_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v})))
-      }
-      .otherwise
-      {
-         printf("Seeing the mispredict with hopefully the right information")
+      // when (!Reg(init=Bool(false), next = io.br_mispredict_val))
+      // {
+      //    pending_readers_list(i) := ((pending_readers_list(i)) + (Vec((io.pending_readers_regs zip io.pending_readers_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v})) - (Vec((io.done_readers_regs zip io.done_readers_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v})))
+      // }
+      // .otherwise
+      // {
+      //    printf("Seeing the mispredict with hopefully the right information")
          pending_readers_list(i) := (((((pending_readers_list(i)) + (Vec((io.pending_readers_regs zip io.pending_readers_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v})) - (Vec((io.done_readers_regs zip io.done_readers_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v}))) - (Vec((io.mis_mem_regs zip io.mis_mem_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v}))) - (Vec((io.mis_int_regs zip io.mis_int_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v}))) - (Vec((io.mis_fp_regs zip io.mis_fp_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v})))       
-      }
+      // }
       if (i==2||i==1||i==0)
       {
          printf(i+"- Add %d Subtract %d Mem %d Int %d FP %d\n",Vec((io.pending_readers_regs zip io.pending_readers_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v}),Vec((io.done_readers_regs zip io.done_readers_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v}),(Vec((io.mis_mem_regs zip io.mis_mem_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v})),(Vec((io.mis_int_regs zip io.mis_int_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v})),(Vec((io.mis_fp_regs zip io.mis_fp_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v})))
