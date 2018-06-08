@@ -105,6 +105,9 @@ class FpPipeline(implicit p: Parameters) extends BoomModule()(p)
    issue_unit.io.brinfo := io.brinfo
    issue_unit.io.flush_pipeline := io.flush_pipeline
 
+   // The mispredicted coming from the issue slots
+   io.mispredicted_uops := issue_unit.io.mispredicted_uops
+
    require (exe_units.num_total_bypass_ports == 0)
 
    //-------------------------------------------------------------

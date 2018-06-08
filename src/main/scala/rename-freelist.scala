@@ -179,7 +179,7 @@ class RenameFreeListHelper(
    }
    for (i <- 0 until num_phys_registers)
    {
-      // when (!Reg(init=Bool(false), next = io.br_mispredict_val))
+      // when (!io.br_mispredict_val)
       // {
       //    pending_readers_list(i) := ((pending_readers_list(i)) + (Vec((io.pending_readers_regs zip io.pending_readers_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v})) - (Vec((io.done_readers_regs zip io.done_readers_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v})))
       // }
