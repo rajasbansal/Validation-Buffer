@@ -186,7 +186,7 @@ class IssueSlot(num_slow_wakeup_ports: Int)(implicit p: Parameters) extends Boom
    when (IsKilledByBranch(io.brinfo, slotUop))
    {
       updated_state := s_invalid
-      when (isValid && !io.grant)
+      when (isValid)
       {
          wasKilled := Bool(true)
          printf("There was a mispredict for DASM(%x) with r1 as %d and r2 as %d with grant %b\n",slotUop.inst,slotUop.pop1, slotUop.pop2, io.grant)
