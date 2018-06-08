@@ -117,6 +117,9 @@ class CommitSignals(machine_width: Int)(implicit p: Parameters) extends BoomBund
    // Perform rollback of rename state (in conjuction with commit.uops).
    val rbk_valids = Vec(machine_width, Bool())
 
+   // Perform rollback of the pending readers
+   val rbk_pending_valids = Vec(machine_width, Bool())
+
    // tell the LSU how many stores and loads are being committed
    val st_mask    = Vec(machine_width, Bool())
    val ld_mask    = Vec(machine_width, Bool())
@@ -524,7 +527,10 @@ class Rob(width: Int,
                               rob_val(com_idx) &&
                               (rob_uop(com_idx).dst_rtype === RT_FIX || rob_uop(com_idx).dst_rtype === RT_FLT) &&
                               Bool(!ENABLE_COMMIT_MAP_TABLE)
-
+      io.commit.rbk_pending_valids(w) :=
+                              (rob_state === s_rollback) &&
+                              rob_val(com_idx) &&
+                              Bool(!ENABLE_COMMIT_MAP_TABLE)
       when (rob_state === s_rollback)
       {
          rob_val(com_idx)       := Bool(false)

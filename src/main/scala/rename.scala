@@ -68,6 +68,7 @@ class RenameStageIO(
    val com_valids = Vec(pl_width, Bool()).asInput
    val com_uops   = Vec(pl_width, new MicroOp()).asInput
    val com_rbk_valids = Vec(pl_width, Bool()).asInput
+   val com_rbk_pending_valids = Vec(pl_width, Bool()).asInput
 
    val flush_pipeline = Bool(INPUT) // only used for SCR (single-cycle reset)
 
@@ -192,6 +193,7 @@ class RenameStage(
       list.io.com_valids := io.com_valids
       list.io.com_uops := io.com_uops
       list.io.com_rbk_valids := io.com_rbk_valids
+      list.io.com_rbk_pending_valids := io.com_rbk_pending_valids
       list.io.flush_pipeline := io.flush_pipeline
       list.io.debug_rob_empty := io.debug_rob_empty
       list.io.pending_done_1 := io.pending_done_1
