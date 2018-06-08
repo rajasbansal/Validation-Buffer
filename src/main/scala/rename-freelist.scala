@@ -39,6 +39,10 @@ class FreeListIo(num_phys_registers: Int, pl_width: Int, size1: Int, size2: Int)
    val rollback_wens  = Vec(pl_width, Bool()).asInput
    val rollback_pdsts = Vec(pl_width, UInt(width=preg_sz)).asInput
 
+   // rollback (on exceptions) for pending readers 
+   val rollback_pending_vals  = Vec(3*pl_width, Bool()).asInput
+   val rollback_pending_regs  = Vec(3*pl_width, UInt(width=preg_sz)).asInput   
+
    // Update the pending readers
    val pending_readers_vals  = Vec(3*pl_width, Bool()).asInput
    val pending_readers_regs  = Vec(3*pl_width, UInt(width=preg_sz)).asInput
@@ -186,7 +190,12 @@ class RenameFreeListHelper(
       // .otherwise
       // {
       //    printf("Seeing the mispredict with hopefully the right information")
-         pending_readers_list(i) := (((((pending_readers_list(i)) + (Vec((io.pending_readers_regs zip io.pending_readers_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v})) - (Vec((io.done_readers_regs zip io.done_readers_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v}))) - (Vec((io.mis_mem_regs zip io.mis_mem_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v}))) - (Vec((io.mis_int_regs zip io.mis_int_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v}))) - (Vec((io.mis_fp_regs zip io.mis_fp_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v})))       
+         pending_readers_list(i) := ((((((pending_readers_list(i)) + (Vec((io.pending_readers_regs zip io.pending_readers_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v})) 
+                                    - (Vec((io.done_readers_regs zip io.done_readers_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v}))) 
+                                    - (Vec((io.mis_mem_regs zip io.mis_mem_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v}))) 
+                                    - (Vec((io.mis_int_regs zip io.mis_int_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v}))) 
+                                    - (Vec((io.mis_fp_regs zip io.mis_fp_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v})))
+                                    - (Vec((io.rollback_pending_regs zip io.rollback_pending_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v})))       
       // }
       if (i==2||i==1||i==0)
       {
@@ -339,6 +348,7 @@ class RenameFreeList(
       val com_valids       = Vec(pl_width, Bool()).asInput
       val com_uops         = Vec(pl_width, new MicroOp()).asInput
       val com_rbk_valids   = Vec(pl_width, Bool()).asInput
+      val com_rbk_pending_valids   = Vec(pl_width, Bool()).asInput
 
 
       val flush_pipeline   = Bool(INPUT)
@@ -500,6 +510,16 @@ class RenameFreeList(
       freelist.io.mis_fp_regs(w)      := io.mis_fp(w).bits.pop1
       freelist.io.mis_fp_regs(w + 20) := io.mis_fp(w).bits.pop2
       freelist.io.mis_fp_regs(w + 40) := io.mis_fp(w).bits.pop3
+   }
+
+   for (w <- 0 until pl_width)
+   {
+      freelist.io.rollback_pending_vals(w)              := io.com_rbk_pending_valids(w) && (io.com_uops(w).lrs1_rtype === UInt(rtype))
+      freelist.io.rollback_pending_vals(w + pl_width)   := io.com_rbk_pending_valids(w) && (io.com_uops(w).lrs2_rtype === UInt(rtype))
+      freelist.io.rollback_pending_vals(w + 2*pl_width) := io.com_rbk_pending_valids(w) && (io.com_uops(w).frs3_en)
+      freelist.io.rollback_pending_regs(w)              := io.com_uops(w).pop1
+      freelist.io.rollback_pending_regs(w + pl_width)   := io.com_uops(w).pop2
+      freelist.io.rollback_pending_regs(w + 2*pl_width) := io.com_uops(w).pop3
    }
    io.can_allocate := freelist.io.can_allocate
    io.debug := freelist.io.debug

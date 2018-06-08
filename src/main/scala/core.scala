@@ -481,6 +481,7 @@ class BoomCore(implicit p: Parameters, edge: uncore.tilelink2.TLEdgeOut) extends
    rename_stage.io.com_valids := rob.io.commit.valids
    rename_stage.io.com_uops := rob.io.commit.uops
    rename_stage.io.com_rbk_valids := rob.io.commit.rbk_valids
+   rename_stage.io.com_rbk_pending_valids := rob.io.commit.rbk_pending_valids
 
    //-------------------------------------------------------------
    //-------------------------------------------------------------
@@ -516,7 +517,7 @@ class BoomCore(implicit p: Parameters, edge: uncore.tilelink2.TLEdgeOut) extends
          iu.io.dis_uops(w).prs2_busy := Bool(false)
       }
    }
-   
+
    //Hardcoded for only two issue units (integer and memory)
    rename_stage.io.mis_mem := issue_units(0).io.mispredicted_uops
    rename_stage.io.mis_int := issue_units(1).io.mispredicted_uops
