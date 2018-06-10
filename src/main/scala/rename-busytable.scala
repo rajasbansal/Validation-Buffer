@@ -38,6 +38,8 @@ class BusyTableIo(
    // marking registers being written back as unbusy
    val unbusy_pdst    = Vec(num_wb_ports, new ValidIO(UInt(width = preg_sz))).flip
 
+   val table_bsy      = Vec(num_pregs, Bool())
+
    val debug = new Bundle { val busytable= Bits(width=num_pregs).asOutput }
 }
 

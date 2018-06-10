@@ -70,7 +70,7 @@ class IssueSlot(num_slow_wakeup_ports: Int)(implicit p: Parameters) extends Boom
    val slot_is_2uops = Reg(Bool())
 
    val slotUop = Reg(init = NullMicroOp)
-
+   wasKilled := Bool(false)
 
    //-----------------------------------------------------------------------------
    // next slot state computation
@@ -81,6 +81,8 @@ class IssueSlot(num_slow_wakeup_ports: Int)(implicit p: Parameters) extends Boom
    when (io.kill)
    {
       slot_state := s_invalid
+      printf("--- There was a pipeline flush\n")
+      wasKilled  := Bool(true)
    }
    .elsewhen (io.in_uop.valid)
    {
@@ -182,7 +184,7 @@ class IssueSlot(num_slow_wakeup_ports: Int)(implicit p: Parameters) extends Boom
 
    // was this micro-op killed by a branch? if yes, we can't let it be valid if
    // we compact it into an other entry
-   wasKilled := Bool(false)
+   
    when (IsKilledByBranch(io.brinfo, slotUop))
    {
       updated_state := s_invalid
