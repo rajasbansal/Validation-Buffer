@@ -326,6 +326,9 @@ class RenameStage(
    fbusytable.io.wb_valids := io.fp_wakeups.map(_.valid)
    fbusytable.io.wb_pdsts := io.fp_wakeups.map(_.bits.uop.pdst)
 
+   ifreelist.io.table_bsy := ibusytable.io.table_bsy
+   ffreelist.io.table_bsy := fbusytable.io.table_bsy
+   
    assert (!(io.fp_wakeups.map(x => x.valid && x.bits.uop.dst_rtype =/= RT_FLT).reduce(_|_)),
       "[rename] fp wakeup is not waking up a FP register.")
 

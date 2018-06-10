@@ -68,6 +68,8 @@ class FreeListIo(num_phys_registers: Int, pl_width: Int, size1: Int, size2: Int)
    val com_wens       = Vec(pl_width, Bool()).asInput
    val com_uops       = Vec(pl_width, new MicroOp()).asInput
 
+   val table_bsy      = Vec(num_pregs, Bool())
+
    val debug = new DebugFreeListIO(num_phys_registers).asOutput
 }
 
@@ -96,6 +98,9 @@ class RenameFreeListHelper(
 
    // ** FREE LIST TABLE ** //
    val free_list = Reg(init=(~Bits(1,num_phys_registers)))
+
+   // ** THE NEWFREE_LIST TABLE ** //
+   val newfree_list = ~Bits(1,num_phys_registers)
 
    // ** PENDING READERS LIST TABLE (CHECK WIDTH OF READERS) ** //
    val pending_readers_list = Reg(init = Vec.fill(num_phys_registers){UInt(0,8)})
@@ -314,7 +319,11 @@ class RenameFreeListHelper(
       io.debug.isprlist := committed_free_list
    }
 
-
+   // Set the newfree_list table 
+   for (i <- 1 until num_pregs)
+   {
+      newfree_list(i) := !table_bsy(i) && valid_remapping_list(i) && (pending_readers(i) === UInt(0))
+   }
 
    // ** SET OUTPUTS ** //
    io.req_pregs := requested_pregs
@@ -352,6 +361,9 @@ class RenameFreeList(
 
 
       val flush_pipeline   = Bool(INPUT)
+
+      // The entire busy table
+      val table_bsy      = Vec(num_pregs, Bool())
 
       //Update the pending readers
       val pending_readers  = Vec(pl_width, new ValidIO(new MicroOp())).asInput
@@ -523,6 +535,7 @@ class RenameFreeList(
    }
    io.can_allocate := freelist.io.can_allocate
    io.debug := freelist.io.debug
+   freelist.io.table_bsy := io.table_bsy
 
    when (io.debug_rob_empty) {
       assert (PopCount(freelist.io.debug.freelist) >= UInt(num_phys_registers - 32),

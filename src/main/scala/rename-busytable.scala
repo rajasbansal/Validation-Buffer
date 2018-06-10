@@ -87,6 +87,8 @@ class BusyTableHelper(
    }
 
    io.debug.busytable := table_bsy.toBits
+
+   io.table_bsy := table_bsy
 }
 
 
@@ -121,6 +123,8 @@ class BusyTable(
 
       // Outputs
       val values                = Vec(pl_width, new BusyTableOutput()).asOutput
+
+      val table_bsy      = Vec(num_pregs, Bool())
 
       val debug                 = new Bundle { val busytable= Bits(width=num_pregs).asOutput }
    }
@@ -190,4 +194,6 @@ class BusyTable(
 
    // scalastyle:on
    io.debug := busy_table.io.debug
+
+   io.table_bsy := busy_table.io.table_bsy
 }
