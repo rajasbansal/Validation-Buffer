@@ -322,7 +322,7 @@ class RenameFreeListHelper(
    // Set the newfree_list table 
    for (i <- 1 until num_phys_registers)
    {
-      newfree_list(i) := !table_bsy(i) && valid_remapping_list(i) && (pending_readers(i) === UInt(0))
+      newfree_list(i) := !io.table_bsy(i) && valid_remapping_list(i) && (pending_readers_list(i) === UInt(0))
    }
 
    // ** SET OUTPUTS ** //
