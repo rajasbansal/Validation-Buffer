@@ -100,7 +100,7 @@ class RenameFreeListHelper(
    val free_list = Reg(init=(~Bits(1,num_phys_registers)))
 
    // ** THE NEWFREE_LIST TABLE ** //
-   val newfree_list = ~Bits(1,num_phys_registers)
+   val newfree_list = Reg(init=(~Bits(1,num_phys_registers)))
 
    // ** PENDING READERS LIST TABLE (CHECK WIDTH OF READERS) ** //
    val pending_readers_list = Reg(init = Vec.fill(num_phys_registers){UInt(0,8)})
@@ -535,7 +535,7 @@ class RenameFreeList(
    }
    io.can_allocate := freelist.io.can_allocate
    io.debug := freelist.io.debug
-   // freelist.io.table_bsy := io.table_bsy
+   freelist.io.table_bsy := io.table_bsy
 
    when (io.debug_rob_empty) {
       assert (PopCount(freelist.io.debug.freelist) >= UInt(num_phys_registers - 32),
