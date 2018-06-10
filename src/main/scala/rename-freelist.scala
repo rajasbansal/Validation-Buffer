@@ -100,7 +100,7 @@ class RenameFreeListHelper(
    val free_list = Reg(init=(~Bits(1,num_phys_registers)))
 
    // ** THE NEWFREE_LIST TABLE ** //
-   val newfree_list = Reg(init=(~Bits(1,num_phys_registers)))
+   val newfree_list = ~Bits(1,num_phys_registers)
 
    // ** PENDING READERS LIST TABLE (CHECK WIDTH OF READERS) ** //
    val pending_readers_list = Reg(init = Vec.fill(num_phys_registers){UInt(0,8)})
@@ -320,10 +320,10 @@ class RenameFreeListHelper(
    }
 
    // Set the newfree_list table 
-   for (i <- 1 until num_phys_registers)
-   {
-      newfree_list(i) := !io.table_bsy(i) && valid_remapping_list(i) && (pending_readers_list(i) === UInt(0))
-   }
+   // for (i <- 1 until num_phys_registers)
+   // {
+   //    newfree_list(i) := !io.table_bsy(i) && valid_remapping_list(i) && (pending_readers_list(i) === UInt(0))
+   // }
 
    // ** SET OUTPUTS ** //
    io.req_pregs := requested_pregs
