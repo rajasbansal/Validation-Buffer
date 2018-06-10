@@ -68,7 +68,7 @@ class FreeListIo(num_phys_registers: Int, pl_width: Int, size1: Int, size2: Int)
    val com_wens       = Vec(pl_width, Bool()).asInput
    val com_uops       = Vec(pl_width, new MicroOp()).asInput
 
-   val table_bsy      = Vec(num_pregs, Bool())
+   val table_bsy      = Vec(num_phys_registers, Bool())
 
    val debug = new DebugFreeListIO(num_phys_registers).asOutput
 }
@@ -320,7 +320,7 @@ class RenameFreeListHelper(
    }
 
    // Set the newfree_list table 
-   for (i <- 1 until num_pregs)
+   for (i <- 1 until num_phys_registers)
    {
       newfree_list(i) := !table_bsy(i) && valid_remapping_list(i) && (pending_readers(i) === UInt(0))
    }
@@ -363,7 +363,7 @@ class RenameFreeList(
       val flush_pipeline   = Bool(INPUT)
 
       // The entire busy table
-      val table_bsy      = Vec(num_pregs, Bool())
+      val table_bsy      = Vec(num_phys_registers, Bool())
 
       //Update the pending readers
       val pending_readers  = Vec(pl_width, new ValidIO(new MicroOp())).asInput
