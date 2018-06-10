@@ -324,7 +324,7 @@ class RenameFreeListHelper(
    // {
    //    newfree_list(i) := !io.table_bsy(i) && valid_remapping_list(i) && (pending_readers_list(i) === UInt(0))
    // }
-   newfree_list := io.table_bsy.toBits & valid_remapping_list & pending_readers_list.map({case(v) => v === UInt(0)}).toBits
+   newfree_list := io.table_bsy.toBits & valid_remapping_list & Vec(pending_readers_list.map({case(v) => v === UInt(0)})).toBits
    // ** SET OUTPUTS ** //
    io.req_pregs := requested_pregs
 
