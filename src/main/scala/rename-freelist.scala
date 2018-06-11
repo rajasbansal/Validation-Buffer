@@ -100,7 +100,7 @@ class RenameFreeListHelper(
    val free_list = Reg(init=(~Bits(1,num_phys_registers)))
 
    // ** THE NEWFREE_LIST TABLE ** //
-   val newfree_list = Vec(num_phys_registers,UInt(0,1))
+   val newfree_list = Wire(Vec(num_phys_registers,UInt(0,1)))
 
    // ** PENDING READERS LIST TABLE (CHECK WIDTH OF READERS) ** //
    val pending_readers_list = Reg(init = Vec.fill(num_phys_registers){UInt(0,8)})
