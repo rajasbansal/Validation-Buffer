@@ -328,7 +328,7 @@ class RenameFreeListHelper(
 
    for (i <- 0 until num_phys_registers)
    {
-      when (newfree_list(i))
+      when (newfree_list(i) === UInt(1))
       {
          printf(i+" register is not free :( %d\n",newfree_list(i))
       }
