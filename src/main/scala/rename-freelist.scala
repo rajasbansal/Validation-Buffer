@@ -100,7 +100,7 @@ class RenameFreeListHelper(
    val free_list = Reg(init=(~Bits(1,num_phys_registers)))
 
    // ** THE NEWFREE_LIST TABLE ** //
-   val newfree_list = Wire(Vec(num_phys_registers,UInt(0,1)))
+   val newfree_list = Wire(Vec(num_phys_registers,UInt(1,1)))
 
    // ** PENDING READERS LIST TABLE (CHECK WIDTH OF READERS) ** //
    val pending_readers_list = Reg(init = Vec.fill(num_phys_registers){UInt(0,8)})
@@ -128,13 +128,14 @@ class RenameFreeListHelper(
    {
       allocated(w) := Bool(false)
    }
-
+   newfree_list(0) := UInt(0)
 
    // don't give out p0
    for (i <- 1 until num_phys_registers)
    {
       val next_allocated = Wire(Vec(pl_width, Bool()))
       var can_allocate = free_list(i)
+      // var can_allocate = newfree_list(i)
 
       for (w <- 0 until pl_width)
       {
@@ -323,6 +324,14 @@ class RenameFreeListHelper(
    for (i <- 1 until num_phys_registers)
    {
       newfree_list(i) := !io.table_bsy(i) && valid_remapping_list(i) && (pending_readers_list(i) === UInt(0))
+   }
+
+   for (i <- 0 until num_phys_registers)
+   {
+      when (newfree_list(i))
+      {
+         printf(i+" register is not free :( %d\n",newfree_list(i))
+      }
    }
    // newfree_list := io.table_bsy.toBits & valid_remapping_list & Vec(pending_readers_list.map({case(v) => v === UInt(0)})).toBits
    // ** SET OUTPUTS ** //
