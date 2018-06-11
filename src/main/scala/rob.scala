@@ -609,23 +609,23 @@ class Rob(width: Int,
       //--------------------------------------------------
       // Debug: for debug purposes, track side-effects to all register destinations
 
-      for (i <- 0 until num_wakeup_ports)
-      {
-         val rob_idx = io.wb_resps(i).bits.uop.rob_idx
-         when (io.debug_wb_valids(i) && MatchBank(GetBankIdx(rob_idx)))
-         {
-            rob_uop(GetRowIdx(rob_idx)).debug_wdata := io.debug_wb_wdata(i)
-         }
-         val temp_uop = rob_uop(GetRowIdx(rob_idx))
+      // for (i <- 0 until num_wakeup_ports)
+      // {
+      //    val rob_idx = io.wb_resps(i).bits.uop.rob_idx
+      //    when (io.debug_wb_valids(i) && MatchBank(GetBankIdx(rob_idx)))
+      //    {
+      //       rob_uop(GetRowIdx(rob_idx)).debug_wdata := io.debug_wb_wdata(i)
+      //    }
+      //    val temp_uop = rob_uop(GetRowIdx(rob_idx))
 
-         assert (!(io.wb_resps(i).valid && MatchBank(GetBankIdx(rob_idx)) &&
-                     !rob_val(GetRowIdx(rob_idx))),
-                  "[ROB] writeback (" + i + ") occurred to an invalid ROB entry.")
-         assert (!(io.wb_resps(i).valid && MatchBank(GetBankIdx(rob_idx)) &&
-                  temp_uop.ldst_val && temp_uop.pdst =/= io.wb_resps(i).bits.uop.pdst),
-                  "[ROB] writeback (" + i + ") occurred to the wrong pdst.")
-      }
-      io.commit.uops(w).debug_wdata := rob_uop(rob_head).debug_wdata
+      //    assert (!(io.wb_resps(i).valid && MatchBank(GetBankIdx(rob_idx)) &&
+      //                !rob_val(GetRowIdx(rob_idx))),
+      //             "[ROB] writeback (" + i + ") occurred to an invalid ROB entry.")
+      //    assert (!(io.wb_resps(i).valid && MatchBank(GetBankIdx(rob_idx)) &&
+      //             temp_uop.ldst_val && temp_uop.pdst =/= io.wb_resps(i).bits.uop.pdst),
+      //             "[ROB] writeback (" + i + ") occurred to the wrong pdst.")
+      // }
+      // io.commit.uops(w).debug_wdata := rob_uop(rob_head).debug_wdata
 
       //--------------------------------------------------
       // Debug: handle passing out signals to printf in dpath
