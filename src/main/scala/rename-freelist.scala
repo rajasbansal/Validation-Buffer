@@ -134,8 +134,8 @@ class RenameFreeListHelper(
    for (i <- 1 until num_phys_registers)
    {
       val next_allocated = Wire(Vec(pl_width, Bool()))
-      var can_allocate = free_list(i)
-      var can_allocate_1 = newfree_list(i).toBool
+      // var can_allocate = free_list(i)
+      var can_allocate = newfree_list(i).toBool
 
       for (w <- 0 until pl_width)
       {
