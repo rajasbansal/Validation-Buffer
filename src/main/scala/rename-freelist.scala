@@ -330,7 +330,7 @@ class RenameFreeListHelper(
    {
       when (newfree_list(i) === UInt(0))
       {
-         printf(i+" register is not free :( %d\n",newfree_list(i))
+         // printf(i+" register is not free :( %d\n",newfree_list(i))
       }
    }
    // newfree_list := io.table_bsy.toBits & valid_remapping_list & Vec(pending_readers_list.map({case(v) => v === UInt(0)})).toBits

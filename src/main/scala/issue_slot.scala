@@ -81,8 +81,11 @@ class IssueSlot(num_slow_wakeup_ports: Int)(implicit p: Parameters) extends Boom
    when (io.kill)
    {
       slot_state := s_invalid
-      printf("--- There was a pipeline flush\n")
-      wasKilled  := Bool(true)
+      when (isValid)
+      {
+         printf("--- There was a pipeline flush\n")
+         wasKilled  := Bool(true)
+      }
    }
    .elsewhen (io.in_uop.valid)
    {
