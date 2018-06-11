@@ -507,7 +507,9 @@ class Rob(width: Int,
       // Commit or Rollback
 
       // can this instruction commit? (the check for exceptions/rob_state happens later)
-      can_commit(w) := rob_val(rob_head) && !(rob_bsy(rob_head)) /* This is where we have to change i.e the
+      // can_commit(w) := (rob_val(rob_head) && !(rob_bsy(rob_head))) // -- Commit-1 (The older commit) 
+      can_commit(w) := (rob_val(rob_head) && !(rob_bsy(rob_head))) || (rob_val(rob_head) && rob_validated(rob_head)) //Commit-2 (relaxed commit)
+                                                                     /* This is where we have to change i.e the
                                                                     instruction can commit because it cannot throw exception*/
 
       val com_idx = Wire(UInt())
