@@ -425,48 +425,48 @@ class Rob(width: Int,
       //-----------------------------------------------
       // Writeback
 
-      for (i <- 0 until num_wakeup_ports)
-      {
-         val wb_resp = io.wb_resps(i)
-         val wb_uop = wb_resp.bits.uop
-         val row_idx = GetRowIdx(wb_uop.rob_idx)
-         when (wb_resp.valid && MatchBank(GetBankIdx(wb_uop.rob_idx)))
-         {
-            rob_bsy(row_idx) := Bool(false)
+//       for (i <- 0 until num_wakeup_ports)
+//       {
+//          val wb_resp = io.wb_resps(i)
+//          val wb_uop = wb_resp.bits.uop
+//          val row_idx = GetRowIdx(wb_uop.rob_idx)
+//          when (wb_resp.valid && MatchBank(GetBankIdx(wb_uop.rob_idx)))
+//          {
+//             rob_bsy(row_idx) := Bool(false)
 
-            if (O3PIPEVIEW_PRINTF)
-            {
-               printf("%d; O3PipeView:complete:%d\n",
-                  rob_uop(row_idx).debug_events.fetch_seq,
-                  io.debug_tsc)
-            }
-         }
-         // TODO check that fflags aren't overwritten
-         // TODO check that the wb is to a valid ROB entry, give it a time stamp
-//         assert (!(wb_resp.valid && MatchBank(GetBankIdx(wb_uop.rob_idx)) &&
-//                  wb_uop.fp_val && !(wb_uop.is_load || wb_uop.is_store) &&
-//                  rob_exc_cause(row_idx) =/= Bits(0)),
-//                  "FP instruction writing back exc bits is overriding an existing exception.")
-      }
+//             if (O3PIPEVIEW_PRINTF)
+//             {
+//                printf("%d; O3PipeView:complete:%d\n",
+//                   rob_uop(row_idx).debug_events.fetch_seq,
+//                   io.debug_tsc)
+//             }
+//          }
+//          // TODO check that fflags aren't overwritten
+//          // TODO check that the wb is to a valid ROB entry, give it a time stamp
+// //         assert (!(wb_resp.valid && MatchBank(GetBankIdx(wb_uop.rob_idx)) &&
+// //                  wb_uop.fp_val && !(wb_uop.is_load || wb_uop.is_store) &&
+// //                  rob_exc_cause(row_idx) =/= Bits(0)),
+// //                  "FP instruction writing back exc bits is overriding an existing exception.")
+//       }
 
-      // Stores have a separate method to clear busy bits
-      for ((clr_valid, clr_rob_idx) <- io.lsu_clr_bsy_valid zip io.lsu_clr_bsy_rob_idx)
-      {
-         when (clr_valid && MatchBank(GetBankIdx(clr_rob_idx)))
-         {
-            val cidx = GetRowIdx(clr_rob_idx)
-            rob_bsy(cidx) := Bool(false)
+//       // Stores have a separate method to clear busy bits
+//       for ((clr_valid, clr_rob_idx) <- io.lsu_clr_bsy_valid zip io.lsu_clr_bsy_rob_idx)
+//       {
+//          when (clr_valid && MatchBank(GetBankIdx(clr_rob_idx)))
+//          {
+//             val cidx = GetRowIdx(clr_rob_idx)
+//             rob_bsy(cidx) := Bool(false)
 
-            assert (rob_val(cidx) === Bool(true), "[rob] store writing back to invalid entry.")
-            assert (rob_bsy(cidx) === Bool(true), "[rob] store writing back to a not-busy entry.")
+//             assert (rob_val(cidx) === Bool(true), "[rob] store writing back to invalid entry.")
+//             assert (rob_bsy(cidx) === Bool(true), "[rob] store writing back to a not-busy entry.")
 
-            if (O3PIPEVIEW_PRINTF)
-            {
-               printf("%d; O3PipeView:complete:%d\n",
-                  rob_uop(GetRowIdx(clr_rob_idx)).debug_events.fetch_seq, io.debug_tsc)
-            }
-         }
-      }
+//             if (O3PIPEVIEW_PRINTF)
+//             {
+//                printf("%d; O3PipeView:complete:%d\n",
+//                   rob_uop(GetRowIdx(clr_rob_idx)).debug_events.fetch_seq, io.debug_tsc)
+//             }
+//          }
+//       }
 
       when (io.brinfo.valid && MatchBank(GetBankIdx(io.brinfo.rob_idx)))
       {
@@ -508,7 +508,7 @@ class Rob(width: Int,
 
       // can this instruction commit? (the check for exceptions/rob_state happens later)
       // can_commit(w) := (rob_val(rob_head) && !(rob_bsy(rob_head))) // -- Commit-1 (The older commit) 
-      can_commit(w) := (rob_val(rob_head) && !(rob_bsy(rob_head))) || (rob_val(rob_head) && rob_validated(rob_head)) //Commit-2 (relaxed commit)
+      can_commit(w) := /*(rob_val(rob_head) && !(rob_bsy(rob_head))) ||*/ (rob_val(rob_head) && rob_validated(rob_head)) //Commit-2 (relaxed commit)
                                                                      /* This is where we have to change i.e the
                                                                     instruction can commit because it cannot throw exception*/
 
