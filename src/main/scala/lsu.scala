@@ -1133,7 +1133,7 @@ class LoadStoreUnit(pl_width: Int)(implicit p: Parameters, edge: uncore.tilelink
       {
          assert (laq_allocated(idx), "[lsu] trying to commit an un-allocated load entry.")
          assert (laq_executed(idx), "[lsu] trying to commit an un-executed load entry.")
-         assert (laq_succeeded(idx), "[lsu] trying to commit an un-succeeded load entry.")
+         // assert (laq_succeeded(idx), "[lsu] trying to commit an un-succeeded load entry.")
 
          laq_allocated(idx)         := Bool(false)
          laq_addr_val (idx)         := Bool(false)
