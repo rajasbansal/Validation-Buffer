@@ -137,11 +137,11 @@ class LoadStoreUnitIO(pl_width: Int, num_wakeup_ports: Int)(implicit p: Paramete
    val emit_validated_ld = new ValidIO(new EmitValidated)
    val emit_validated_st = new ValidIO(new EmitValidated)
 
-   override def cloneType: this.type = new LoadStoreUnitIO(pl_width)(p).asInstanceOf[this.type]
+   override def cloneType: this.type = new LoadStoreUnitIO(pl_width, num_wakeup_ports)(p).asInstanceOf[this.type]
 }
 
 
-class LoadStoreUnitIO(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters, edge: uncore.tilelink2.TLEdgeOut) extends BoomModule()(p)
+class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters, edge: uncore.tilelink2.TLEdgeOut) extends BoomModule()(p)
 {
    val io = new LoadStoreUnitIO(pl_width, num_wakeup_ports)
 

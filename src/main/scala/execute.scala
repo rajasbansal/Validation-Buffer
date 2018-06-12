@@ -65,7 +65,7 @@ class ExecutionUnitIO(num_rf_read_ports: Int
    val fcsr_rm = Bits(INPUT, tile.FPConstants.RM_SZ)
 
    // only used by the mem unit
-   val lsu_io = new LoadStoreUnitIO(DECODE_WIDTH).flip
+   val lsu_io = new LoadStoreUnitIO(DECODE_WIDTH,40).flip
    val dmem   = new DCMemPortIO() // TODO move this out of ExecutionUnit
    val com_exception = Bool(INPUT)
 }
