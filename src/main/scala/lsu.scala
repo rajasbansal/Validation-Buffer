@@ -1159,16 +1159,17 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
       when (wb_resp.valid && wb_uop.is_load)
       {
          laq_completed(row_idx) := Bool(true)
-         assert (laq_allocated(idx), "[lsu] trying to commit an un-allocated load entry.")
-         assert (laq_executed(idx), "[lsu] trying to commit an un-executed load entry.")
-         assert (laq_succeeded(idx), "[lsu] trying to commit an un-succeeded load entry.")
+         assert (laq_allocated(row_idx), "[lsu] trying to commit an un-allocated load entry.")
+         assert (laq_executed(row_idx), "[lsu] trying to commit an un-executed load entry.")
+         assert (laq_succeeded(row_idx), "[lsu] trying to commit an un-succeeded load entry.")
 
-         laq_allocated(idx)         := Bool(false)
-         laq_addr_val (idx)         := Bool(false)
-         laq_executed (idx)         := Bool(false)
-         laq_succeeded(idx)         := Bool(false)
-         laq_failure  (idx)         := Bool(false)
-         laq_forwarded_std_val(idx) := Bool(false)
+         laq_allocated(row_idx)         := Bool(false)
+         laq_addr_val (row_idx)         := Bool(false)
+         laq_executed (row_idx)         := Bool(false)
+         laq_succeeded(row_idx)         := Bool(false)
+         laq_failure  (row_idx)         := Bool(false)
+         laq_forwarded_std_val(row_idx) := Bool(false)
+         laq_completed(row_idx)         := Bool(false)
       }
    }
    laq_head := Mux((laq_head =/= laq_tail) && laq_completed(laq_head), WrapInc(laq_head, num_ld_entries), laq_head)
