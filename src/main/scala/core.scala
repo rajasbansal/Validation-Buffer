@@ -849,11 +849,15 @@ class BoomCore(implicit p: Parameters, edge: uncore.tilelink2.TLEdgeOut) extends
             val ll_uop = ll_wbarb.io.out.bits.uop
             rob.io.wb_resps(cnt).valid := ll_wbarb.io.out.valid && !(ll_uop.is_store && !ll_uop.is_amo)
             rob.io.wb_resps(cnt).bits <> ll_wbarb.io.out.bits
+            lsu.io.wb_resps(cnt).valid := ll_wbarb.io.out.valid && !(ll_uop.is_store && !ll_uop.is_amo)
+            lsu.io.wb_resps(cnt).bits <> ll_wbarb.io.out.bits
          }
          else
          {
             rob.io.wb_resps(cnt).valid := resp.valid && !(wb_uop.is_store && !wb_uop.is_amo)
             rob.io.wb_resps(cnt).bits <> resp.bits
+            lsu.io.wb_resps(cnt).valid := resp.valid && !(wb_uop.is_store && !wb_uop.is_amo)
+            lsu.io.wb_resps(cnt).bits <> resp.bits
          }
 
          // for commit logging...
@@ -901,6 +905,7 @@ class BoomCore(implicit p: Parameters, edge: uncore.tilelink2.TLEdgeOut) extends
    for (wakeup <- fp_pipeline.io.wakeups)
    {
       rob.io.wb_resps(cnt) <> wakeup
+      lsu.io.wb_resps(cnt) <> wakeup
       rob.io.fflags(f_cnt) <> wakeup.bits.fflags
       rob.io.debug_wb_valids(cnt) := Bool(false) // TODO XXX add back commit logging for FP instructions.
       cnt += 1

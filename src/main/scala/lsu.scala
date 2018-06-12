@@ -137,6 +137,9 @@ class LoadStoreUnitIO(pl_width: Int, num_wakeup_ports: Int)(implicit p: Paramete
    val emit_validated_ld = new ValidIO(new EmitValidated)
    val emit_validated_st = new ValidIO(new EmitValidated)
 
+   // Release the LSQ entries if writeback is complete
+   val wb_resps = Vec(num_wakeup_ports, Valid(new ExeUnitResp(xLen max fLen+1))).flip
+
    override def cloneType: this.type = new LoadStoreUnitIO(pl_width, num_wakeup_ports)(p).asInstanceOf[this.type]
 }
 
@@ -160,6 +163,7 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
    val laq_succeeded      = Reg(Vec(num_ld_entries, Bool())) // load has returned from memory, but may still have an ordering failure
    val laq_failure        = Reg(init = Vec.fill(num_ld_entries) { Bool(false) })  // ordering fail, must retry (at commit time, which requires a rollback)
    val laq_uop            = Reg(Vec(num_ld_entries, new MicroOp()))
+   val laq_completed      = Reg(Vec(num_ld_entries, Bool()))
    //laq_uop.stq_idx between oldest and youngest (dep_mask can't establish age :( ), "aka store coloring" if you're Intel
 //   val laq_request   = Vec.fill(num_ld_entries) { Reg(resetVal = Bool(false)) } // TODO sleeper load requesting issue to memory (perhaps stores broadcast, sees its store-set finished up)
 
@@ -241,7 +245,7 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
          laq_failure  (ld_enq_idx)    := Bool(false)
          laq_forwarded_std_val(ld_enq_idx)  := Bool(false)
          debug_laq_put_to_sleep(ld_enq_idx) := Bool(false)
-
+         laq_completed                := Bool(false)
          assert (ld_enq_idx === io.dec_uops(w).ldq_idx, "[lsu] mismatch enq load tag.")
       }
       ld_enq_idx = Mux(io.dec_ld_vals(w), WrapInc(ld_enq_idx, num_ld_entries),
@@ -1124,13 +1128,37 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
       }
    }
 
+   // Removed as the load entry should be realeased only on completion of the load
+   // var temp_laq_head = laq_head
+   // for (w <- 0 until pl_width)
+   // {
+   //    val idx = temp_laq_head
+   //    when (io.commit_load_mask(w))
+   //    {
+   //       assert (laq_allocated(idx), "[lsu] trying to commit an un-allocated load entry.")
+   //       assert (laq_executed(idx), "[lsu] trying to commit an un-executed load entry.")
+   //       assert (laq_succeeded(idx), "[lsu] trying to commit an un-succeeded load entry.")
 
-   var temp_laq_head = laq_head
-   for (w <- 0 until pl_width)
+   //       laq_allocated(idx)         := Bool(false)
+   //       laq_addr_val (idx)         := Bool(false)
+   //       laq_executed (idx)         := Bool(false)
+   //       laq_succeeded(idx)         := Bool(false)
+   //       laq_failure  (idx)         := Bool(false)
+   //       laq_forwarded_std_val(idx) := Bool(false)
+   //    }
+
+   //    temp_laq_head = Mux(io.commit_load_mask(w), WrapInc(temp_laq_head, num_ld_entries), temp_laq_head)
+   // }
+   // laq_head := temp_laq_head
+
+   for (i <- 0 until num_wakeup_ports)
    {
-      val idx = temp_laq_head
-      when (io.commit_load_mask(w))
+      val wb_resp = io.wb_resps(i)
+      val wb_uop = wb_resp.bits.uop
+      val row_idx = (wb_uop.ldq_idx)
+      when (wb_resp.valid && wb_uop.is_load)
       {
+         laq_completed(row_idx) := Bool(true)
          assert (laq_allocated(idx), "[lsu] trying to commit an un-allocated load entry.")
          assert (laq_executed(idx), "[lsu] trying to commit an un-executed load entry.")
          assert (laq_succeeded(idx), "[lsu] trying to commit an un-succeeded load entry.")
@@ -1142,11 +1170,8 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
          laq_failure  (idx)         := Bool(false)
          laq_forwarded_std_val(idx) := Bool(false)
       }
-
-      temp_laq_head = Mux(io.commit_load_mask(w), WrapInc(temp_laq_head, num_ld_entries), temp_laq_head)
    }
-   laq_head := temp_laq_head
-
+   laq_head := Mux((laq_head =/= laq_tail) && laq_completed(laq_head), WrapInc(laq_head, num_ld_entries), laq_head)
 
 
    //-------------------------------------------------------------
