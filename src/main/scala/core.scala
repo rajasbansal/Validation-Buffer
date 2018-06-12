@@ -93,7 +93,7 @@ class BoomCore(implicit p: Parameters, edge: uncore.tilelink2.TLEdgeOut) extends
                                  xLen))
    val csr              = Module(new rocket.CSRFile())
    val dc_shim          = Module(new DCacheShim())
-   val lsu              = Module(new LoadStoreUnit(DECODE_WIDTH))
+   val lsu              = Module(new LoadStoreUnit(DECODE_WIDTH, num_irf_write_ports + fp_pipeline.io.wakeups.length))
    val rob              = Module(new Rob(
                                  DECODE_WIDTH,
                                  NUM_ROB_ENTRIES,

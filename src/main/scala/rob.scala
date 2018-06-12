@@ -199,7 +199,7 @@ class Rob(width: Int,
                                    // and in getting next-pc causes wrap
                                    // around, thus the banks must have equal
                                    // numbers of items.
-
+   println("    Number of wakeup ports : " + num_wakeup_ports)
    println("    Machine Width  : " + width); require (isPow2(width))
    println("    Rob Entries    : " + num_rob_entries)
    println("    Rob Rows       : " + num_rob_rows)

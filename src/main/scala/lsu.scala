@@ -52,7 +52,7 @@ import config.Parameters
 import util.Str
 import uncore.constants.MemoryOpConstants._
 
-class LoadStoreUnitIO(pl_width: Int)(implicit p: Parameters) extends BoomBundle()(p)
+class LoadStoreUnitIO(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters) extends BoomBundle()(p)
 {
    // Decode Stage
    // Track which stores are "alive" in the pipeline
@@ -141,9 +141,9 @@ class LoadStoreUnitIO(pl_width: Int)(implicit p: Parameters) extends BoomBundle(
 }
 
 
-class LoadStoreUnit(pl_width: Int)(implicit p: Parameters, edge: uncore.tilelink2.TLEdgeOut) extends BoomModule()(p)
+class LoadStoreUnitIO(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters, edge: uncore.tilelink2.TLEdgeOut) extends BoomModule()(p)
 {
-   val io = new LoadStoreUnitIO(pl_width)
+   val io = new LoadStoreUnitIO(pl_width, num_wakeup_ports)
 
    val num_ld_entries = NUM_LSU_ENTRIES
    val num_st_entries = NUM_LSU_ENTRIES
@@ -1133,7 +1133,7 @@ class LoadStoreUnit(pl_width: Int)(implicit p: Parameters, edge: uncore.tilelink
       {
          assert (laq_allocated(idx), "[lsu] trying to commit an un-allocated load entry.")
          assert (laq_executed(idx), "[lsu] trying to commit an un-executed load entry.")
-         // assert (laq_succeeded(idx), "[lsu] trying to commit an un-succeeded load entry.")
+         assert (laq_succeeded(idx), "[lsu] trying to commit an un-succeeded load entry.")
 
          laq_allocated(idx)         := Bool(false)
          laq_addr_val (idx)         := Bool(false)
