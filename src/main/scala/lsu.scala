@@ -245,7 +245,7 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
          laq_failure  (ld_enq_idx)    := Bool(false)
          laq_forwarded_std_val(ld_enq_idx)  := Bool(false)
          debug_laq_put_to_sleep(ld_enq_idx) := Bool(false)
-         laq_completed                := Bool(false)
+         laq_completed(ld_enq_idx)          := Bool(false)
          assert (ld_enq_idx === io.dec_uops(w).ldq_idx, "[lsu] mismatch enq load tag.")
       }
       ld_enq_idx = Mux(io.dec_ld_vals(w), WrapInc(ld_enq_idx, num_ld_entries),
