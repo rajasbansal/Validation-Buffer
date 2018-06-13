@@ -140,6 +140,9 @@ class LoadStoreUnitIO(pl_width: Int, num_wakeup_ports: Int)(implicit p: Paramete
    // Release the LSQ entries if writeback is complete
    val wb_resps = Vec(num_wakeup_ports, Valid(new ExeUnitResp(xLen max fLen+1))).flip
 
+   // Find the instructions which have been validated and should not release their LSQ entries
+   val commit = new CommitSignals(2).asOutput
+
    override def cloneType: this.type = new LoadStoreUnitIO(pl_width, num_wakeup_ports)(p).asInstanceOf[this.type]
 }
 
@@ -164,6 +167,7 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
    val laq_failure        = Reg(init = Vec.fill(num_ld_entries) { Bool(false) })  // ordering fail, must retry (at commit time, which requires a rollback)
    val laq_uop            = Reg(Vec(num_ld_entries, new MicroOp()))
    val laq_completed      = Reg(Vec(num_ld_entries, Bool()))
+   val laq_validated      = Reg(Vec(num_ld_entries, Bool()))
    //laq_uop.stq_idx between oldest and youngest (dep_mask can't establish age :( ), "aka store coloring" if you're Intel
 //   val laq_request   = Vec.fill(num_ld_entries) { Reg(resetVal = Bool(false)) } // TODO sleeper load requesting issue to memory (perhaps stores broadcast, sees its store-set finished up)
 
@@ -246,6 +250,7 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
          laq_forwarded_std_val(ld_enq_idx)  := Bool(false)
          debug_laq_put_to_sleep(ld_enq_idx) := Bool(false)
          laq_completed(ld_enq_idx)          := Bool(false)
+         laq_validated(ld_enq_idx)          := Bool(false)
          assert (ld_enq_idx === io.dec_uops(w).ldq_idx, "[lsu] mismatch enq load tag.")
       }
       ld_enq_idx = Mux(io.dec_ld_vals(w), WrapInc(ld_enq_idx, num_ld_entries),
@@ -851,7 +856,18 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
          }
       }
    }
+   //------------------------
+   // Handle Validated Instruction Responses
+   //------------------------
 
+   for (w <- 0 until 2)
+   {
+      when (io.commit.valids(w) && io.commit.uops(w).is_load)
+      {
+         laq_validated(io.commit.uops(w).ldq_idx) := Bool(true)
+         printf("This %d has been validated with inst [DASM(%x)]\n", io.commit.uops(w).ldq_idx, io.commit.uops(w).inst)
+      }
+   }
    //-------------------------------------------------------------
    //-------------------------------------------------------------
    // Search LAQ for misspeculated load orderings
@@ -1246,11 +1262,10 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
 
    when (reset.toBool || io.exception)
    {
-      laq_head := UInt(0, MEM_ADDR_SZ)
-      laq_tail := UInt(0, MEM_ADDR_SZ)
-
       when (reset.toBool)
       {
+         laq_head := UInt(0, MEM_ADDR_SZ)
+         laq_tail := UInt(0, MEM_ADDR_SZ)
          stq_head := UInt(0, MEM_ADDR_SZ)
          stq_tail := UInt(0, MEM_ADDR_SZ)
          stq_commit_head := UInt(0, MEM_ADDR_SZ)
@@ -1265,6 +1280,13 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
          for (i <- 0 until num_st_entries)
          {
             stq_uop(i) := null_uop
+         }
+
+         for (i <- 0 until num_ld_entries)
+         {
+            laq_addr_val(i)    := Bool(false)
+            laq_allocated(i)   := Bool(false)
+            laq_executed(i)    := Bool(false)
          }
       }
       .otherwise // exception
@@ -1281,13 +1303,17 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
                st_exc_killed_mask(i) := Bool(true)
             }
          }
-      }
 
-      for (i <- 0 until num_ld_entries)
-      {
-         laq_addr_val(i)    := Bool(false)
-         laq_allocated(i)   := Bool(false)
-         laq_executed(i)    := Bool(false)
+         for (i <- 0 until num_ld_entries)
+         {
+            when (!laq_validated(i))
+            { 
+               laq_addr_val(i)    := Bool(false)
+               laq_allocated(i)   := Bool(false)
+               laq_executed(i)    := Bool(false)
+               laq_completed(i)   := Bool(true)
+            }
+         }
       }
 
    }
@@ -1349,7 +1375,7 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
       {
          val t_laddr = laq_addr(i)
          val t_saddr = saq_addr(i)
-         printf("         ldq[%d]=(%c%c%c%c%c%c%c%c%d) st_dep(%d,m=%x) 0x%x %c %c   saq[%d]=(%c%c%c%c%c%c%c) b:%x 0x%x -> 0x%x %c %c %c %c\n"
+         printf("         ldq[%d]=(%c%c%c%c%c%c%c%c%c%d) st_dep(%d,m=%x) 0x%x %c %c   saq[%d]=(%c%c%c%c%c%c%c) b:%x 0x%x -> 0x%x %c %c %c %c\n"
             , UInt(i, MEM_ADDR_SZ)
             , Mux(laq_allocated(i), Str("V"), Str("-"))
             , Mux(laq_addr_val(i), Str("A"), Str("-"))
@@ -1359,6 +1385,7 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
             , Mux(laq_is_uncacheable(i), Str("U"), Str("_"))
             , Mux(laq_forwarded_std_val(i), Str("X"), Str("_"))
             , Mux(laq_completed(i), Str("C"), Str("_"))
+            , Mux(laq_validated(i), Str("D"), Str("_"))
             , laq_forwarded_stq_idx(i)
             , laq_uop(i).stq_idx // youngest dep-store
             , laq_st_dep_mask(i)
