@@ -1288,6 +1288,10 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
          laq_addr_val(i)    := Bool(false)
          laq_allocated(i)   := Bool(false)
          laq_executed(i)    := Bool(false)
+         when (laq_uop(i).validated)
+         {
+            printf("Validated entry which has been killed by the exception\n")
+         }
       }
 
    }

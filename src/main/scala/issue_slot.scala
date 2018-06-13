@@ -84,7 +84,6 @@ class IssueSlot(num_slow_wakeup_ports: Int)(implicit p: Parameters) extends Boom
       when (isValid)
       {
          printf("--- There was a pipeline flush\n")
-         printf("The bubble is DASM(%x)\n",UInt(0x4033, 32))
          wasKilled  := Bool(true)
       }
    }
@@ -259,6 +258,10 @@ class IssueSlot(num_slow_wakeup_ports: Int)(implicit p: Parameters) extends Boom
       }
    }
 
+   when (isValid && slotUop.validated)
+   {
+      printf("The microop here has been validated\n")
+   }
    // debug outputs
    io.debug.p1 := slot_p1
    io.debug.p2 := slot_p2

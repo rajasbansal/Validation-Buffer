@@ -368,7 +368,10 @@ class Rob(width: Int,
    // --------------------------------------------------------------------------
    // **************************************************************************
 
-
+   for (w <- 0 until width)
+   {
+      io.commit.uops(w).validated := io.commit.valids(w)
+   }
    for (w <- 0 until width)
    {
       def MatchBank(bank_idx: UInt): Bool = (bank_idx === UInt(w))
