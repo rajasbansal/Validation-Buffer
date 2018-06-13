@@ -295,7 +295,6 @@ trait ScalarOpConstants
    // Reasoning for this is to let visualizers and stat-trackers differentiate
    // between software NOPs and machine-generated Bubbles in the pipeline.
    val BUBBLE  = UInt(0x4033, 32)
-   println("The bubble is DASM(%x)",BUBBLE)
    
    def NullMicroOp()(implicit p: Parameters): MicroOp =
    {

@@ -84,6 +84,7 @@ class IssueSlot(num_slow_wakeup_ports: Int)(implicit p: Parameters) extends Boom
       when (isValid)
       {
          printf("--- There was a pipeline flush\n")
+         printf("The bubble is DASM(%x)\n",UInt(0x4033, 32))
          wasKilled  := Bool(true)
       }
    }
