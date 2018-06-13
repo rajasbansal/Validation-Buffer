@@ -838,6 +838,7 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
       when (io.memresp.bits.is_load)
       {
          laq_succeeded(io.memresp.bits.ldq_idx) := Bool(true)
+         printf("Received the memory response from the the load queue id %d\n", io.memresp.bits.ldq_idx)
       }
       .otherwise
       {
@@ -1158,11 +1159,11 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
       val row_idx = (wb_uop.ldq_idx)
       when (wb_resp.valid && wb_uop.is_load)
       {
-         printf("The load has been ccompleted")
+         printf("The load has been completed\n")
          laq_completed(row_idx) := Bool(true)
          assert (laq_allocated(row_idx), "[lsu] trying to commit an un-allocated load entry.")
          assert (laq_executed(row_idx), "[lsu] trying to commit an un-executed load entry.")
-         assert (laq_succeeded(row_idx), "[lsu] trying to commit an un-succeeded load entry.")
+         // assert (laq_succeeded(row_idx), "[lsu] trying to commit an un-succeeded load entry.")
 
          laq_allocated(row_idx)         := Bool(false)
          laq_addr_val (row_idx)         := Bool(false)
