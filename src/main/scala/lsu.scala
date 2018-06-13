@@ -1158,6 +1158,7 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
       val row_idx = (wb_uop.ldq_idx)
       when (wb_resp.valid && wb_uop.is_load)
       {
+         printf("The load has been ccompleted")
          laq_completed(row_idx) := Bool(true)
          assert (laq_allocated(row_idx), "[lsu] trying to commit an un-allocated load entry.")
          assert (laq_executed(row_idx), "[lsu] trying to commit an un-executed load entry.")
@@ -1169,7 +1170,7 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
          laq_succeeded(row_idx)         := Bool(false)
          laq_failure  (row_idx)         := Bool(false)
          laq_forwarded_std_val(row_idx) := Bool(false)
-         laq_completed(row_idx)         := Bool(false)
+         // laq_completed(row_idx)         := Bool(false)
       }
    }
    laq_head := Mux((laq_head =/= laq_tail) && laq_completed(laq_head), WrapInc(laq_head, num_ld_entries), laq_head)
@@ -1347,7 +1348,7 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
       {
          val t_laddr = laq_addr(i)
          val t_saddr = saq_addr(i)
-         printf("         ldq[%d]=(%c%c%c%c%c%c%c%d) st_dep(%d,m=%x) 0x%x %c %c   saq[%d]=(%c%c%c%c%c%c%c) b:%x 0x%x -> 0x%x %c %c %c %c\n"
+         printf("         ldq[%d]=(%c%c%c%c%c%c%c%c%d) st_dep(%d,m=%x) 0x%x %c %c   saq[%d]=(%c%c%c%c%c%c%c) b:%x 0x%x -> 0x%x %c %c %c %c\n"
             , UInt(i, MEM_ADDR_SZ)
             , Mux(laq_allocated(i), Str("V"), Str("-"))
             , Mux(laq_addr_val(i), Str("A"), Str("-"))
@@ -1356,6 +1357,7 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
             , Mux(laq_failure(i), Str("F"), Str("_"))
             , Mux(laq_is_uncacheable(i), Str("U"), Str("_"))
             , Mux(laq_forwarded_std_val(i), Str("X"), Str("_"))
+            , Mux(laq_completed(i), Str("C"), Str("_"))
             , laq_forwarded_stq_idx(i)
             , laq_uop(i).stq_idx // youngest dep-store
             , laq_st_dep_mask(i)
