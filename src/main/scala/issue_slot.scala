@@ -82,18 +82,23 @@ class IssueSlot(num_slow_wakeup_ports: Int)(implicit p: Parameters) extends Boom
 
    when (io.kill)
    {
-      slot_state := s_invalid
+      
       when (isValid)
       {
          printf("--- There was a pipeline flush\n")
       }
       when (isValid && !slotUop.validated)
       {
+
          wasKilled  := Bool(true)  
       }
       when (isValid && slotUop.validated)
       {
          printf("A valid entry has been removed with the instruction being DASM(%x)\n", slotUop.inst)
+      }
+      .otherwise
+      {
+         slot_state := s_invalid
       }
    }
    .elsewhen (io.in_uop.valid)
