@@ -141,7 +141,7 @@ class LoadStoreUnitIO(pl_width: Int, num_wakeup_ports: Int)(implicit p: Paramete
    val wb_resps = Vec(num_wakeup_ports, Valid(new ExeUnitResp(xLen max fLen+1))).flip
 
    // Find the instructions which have been validated and should not release their LSQ entries
-   val commit = new CommitSignals(2).asOutput
+   val commit = new CommitSignals(2).asInput
 
    override def cloneType: this.type = new LoadStoreUnitIO(pl_width, num_wakeup_ports)(p).asInstanceOf[this.type]
 }
