@@ -84,6 +84,7 @@ class IssueUnitCollasping(
       issue_slots(i).brinfo       := io.brinfo
       issue_slots(i).kill         := io.flush_pipeline
       issue_slots(i).clear        := shamts_oh(i) =/= UInt(0)
+      issue_slots(i).commit       := io.commit
    }
 
    //-------------------------------------------------------------

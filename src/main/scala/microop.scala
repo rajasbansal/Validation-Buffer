@@ -104,6 +104,9 @@ class MicroOp(implicit p: Parameters) extends BoomBundle()(p)
    val debug_wdata      = UInt(width=xLen)
    val debug_events     = new DebugStageEvents
 
+   // has this microop been validated?
+   val validated        = Bool()
+
    def fu_code_is(_fu: UInt) = fu_code === _fu
 }
 

@@ -41,6 +41,8 @@ class IssueSlotIO(num_wakeup_ports: Int)(implicit p: Parameters) extends BoomBun
     }
     result.asOutput
   }
+   // The committed microops
+   val commit = new CommitSignals(2).asInput
 
    override def cloneType = new IssueSlotIO(num_wakeup_ports)(p).asInstanceOf[this.type]
 }
@@ -84,8 +86,11 @@ class IssueSlot(num_slow_wakeup_ports: Int)(implicit p: Parameters) extends Boom
       when (isValid)
       {
          printf("--- There was a pipeline flush\n")
-         printf("The bubble is DASM(%x)\n",UInt(0x4033, 32))
          wasKilled  := Bool(true)
+      }
+      when (isValid && slotUop.validated)
+      {
+         printf("A valid entry has been removed with the instruction being DASM(%x)", slotUop.inst)
       }
    }
    .elsewhen (io.in_uop.valid)
@@ -259,6 +264,14 @@ class IssueSlot(num_slow_wakeup_ports: Int)(implicit p: Parameters) extends Boom
       }
    }
 
+   for (w <- 0 until 2)
+   {
+      when (io.commit.valids(w) && (io.commit.uops(w).rob_idx === slotUop.rob_idx) && isValid)
+      {
+         slotUop.validated := Bool(true)
+         printf("This MicroOp does have a load queue id of %d and rob_id of %d and it is [DASM(%x)]",io.commit.uops(w).ldq_idx,io.commit.uops(w).rob_idx, slotUop.inst)
+      }
+   }
    // debug outputs
    io.debug.p1 := slot_p1
    io.debug.p2 := slot_p2

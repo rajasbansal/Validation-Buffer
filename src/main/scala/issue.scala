@@ -47,6 +47,9 @@ class IssueUnitIO(issue_width: Int, num_wakeup_ports: Int, num_issue_slots: Int)
    val tsc_reg        = UInt(INPUT, xLen)
 
    val mispredicted_uops = Vec(num_issue_slots, new ValidIO(new MicroOp()))
+
+   // The committed microops
+   val commit = new CommitSignals(2).asInput
 }
 
 abstract class IssueUnit(
