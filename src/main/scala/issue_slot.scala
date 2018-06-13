@@ -260,7 +260,7 @@ class IssueSlot(num_slow_wakeup_ports: Int)(implicit p: Parameters) extends Boom
 
    when (isValid && slotUop.validated)
    {
-      printf("The microop here has been validated\n")
+      printf("The microop here has been validated DASM(%x)\n", slotUop.inst)
    }
    // debug outputs
    io.debug.p1 := slot_p1

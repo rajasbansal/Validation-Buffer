@@ -1281,6 +1281,13 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
                st_exc_killed_mask(i) := Bool(true)
             }
          }
+         for (i <- 0 until num_ld_entries)
+         {
+            when (laq_uop(i).validated)
+            {
+               printf("Validated entry which has been killed by the exception with id " + i + " and instruction DASM(%x)\n", laq_uop(i).inst)
+            }
+         }
       }
 
       for (i <- 0 until num_ld_entries)
@@ -1288,10 +1295,6 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
          laq_addr_val(i)    := Bool(false)
          laq_allocated(i)   := Bool(false)
          laq_executed(i)    := Bool(false)
-         when (laq_uop(i).validated)
-         {
-            printf("Validated entry which has been killed by the exception\n")
-         }
       }
 
    }
