@@ -504,6 +504,10 @@ class BoomCore(implicit p: Parameters, edge: uncore.tilelink2.TLEdgeOut) extends
 
    require (issue_units.map(_.issue_width).sum == exe_units.length)
 
+   for (iu <- issue_units)
+   {
+      iu.io.commit := rob.io.commit
+   }
    // Input (Dispatch)
    for {
       iu <- issue_units
