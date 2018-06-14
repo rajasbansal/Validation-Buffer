@@ -556,9 +556,9 @@ class MemExeUnit(implicit p: Parameters) extends ExecutionUnit(num_rf_read_ports
    {
       printf("Receiving try1- %b for [DASM(%x)]\n", io.lsu_io.memreq_uop.validated, io.lsu_io.memreq_uop.inst)
    }
-   when (io.dmem.resp.bits.uop.is_load && io.dmem.resp.valid)
+   when (memresp_val)
    {
-      printf("Receiving try2- %b for [DASM(%x)]\n", io.dmem.resp.bits.uop.validated, io.dmem.resp.bits.uop.inst)
+      printf("Receiving try2- %b for [DASM(%x)]\n", memresp_uop.inst)
    }
    // I should be timing forwarding to coincide with dmem resps, so I'm not clobbering
    //anything....
