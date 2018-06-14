@@ -544,9 +544,9 @@ class MemExeUnit(implicit p: Parameters) extends ExecutionUnit(num_rf_read_ports
    // TODO get rid of com_exception and guard with an assert? Need to surpress within dc-shim.
 //   assert (!(io.com_exception && lsu.io.memreq_uop.is_load && lsu.io.memreq_val),
 //      "[execute] a valid load is returning while an exception is being thrown.")
-   io.dmem.req.valid      := Mux(io.com_exception && io.lsu_io.memreq_uop.is_load && (!io.lsu_io.memreq_uop.validated),
-                              Bool(false),
-                              io.lsu_io.memreq_val)
+   io.dmem.req.valid      := /*Mux(io.com_exception && io.lsu_io.memreq_uop.is_load,
+                              Bool(false),*/
+                              io.lsu_io.memreq_val
    io.dmem.req.bits.addr  := io.lsu_io.memreq_addr
    io.dmem.req.bits.data  := io.lsu_io.memreq_wdata
    io.dmem.req.bits.uop   := io.lsu_io.memreq_uop
@@ -562,8 +562,7 @@ class MemExeUnit(implicit p: Parameters) extends ExecutionUnit(num_rf_read_ports
    }
    // I should be timing forwarding to coincide with dmem resps, so I'm not clobbering
    //anything....
-   val memresp_val    = Mux(io.com_exception && io.dmem.resp.bits.uop.is_load && (!io.dmem.resp.bits.uop.validated), Bool(false),
-                                                io.lsu_io.forward_val || io.dmem.resp.valid)
+   val memresp_val    = io.lsu_io.forward_val || io.dmem.resp.valid
    val memresp_rf_wen = (io.dmem.resp.valid && (io.dmem.resp.bits.uop.mem_cmd === M_XRD || io.dmem.resp.bits.uop.is_amo)) ||  // TODO should I refactor this to use is_load?
                            io.lsu_io.forward_val
    val memresp_uop    = Mux(io.lsu_io.forward_val, io.lsu_io.forward_uop,
