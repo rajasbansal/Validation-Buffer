@@ -556,10 +556,7 @@ class MemExeUnit(implicit p: Parameters) extends ExecutionUnit(num_rf_read_ports
    {
       printf("Receiving try1- %b for [DASM(%x)]\n", io.lsu_io.memreq_uop.validated, io.lsu_io.memreq_uop.inst)
    }
-   when (memresp_val)
-   {
-      printf("Receiving try2- %b for [DASM(%x)]\n", memresp_uop.inst)
-   }
+  
    // I should be timing forwarding to coincide with dmem resps, so I'm not clobbering
    //anything....
    val memresp_val    = io.lsu_io.forward_val || io.dmem.resp.valid
@@ -570,6 +567,10 @@ class MemExeUnit(implicit p: Parameters) extends ExecutionUnit(num_rf_read_ports
 
    val memresp_data = Mux(io.lsu_io.forward_val, io.lsu_io.forward_data, io.dmem.resp.bits.data_subword)
 
+   when (memresp_val)
+   {
+      printf("Receiving try2- %b for [DASM(%x)]\n", memresp_uop.inst)
+   }
    io.lsu_io.memresp.valid := memresp_val
    io.lsu_io.memresp.bits  := memresp_uop
 
