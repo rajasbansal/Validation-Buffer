@@ -864,7 +864,8 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
    {
       when (io.commit.valids(w) && io.commit.uops(w).is_load)
       {
-         laq_validated(io.commit.uops(w).ldq_idx) := Bool(true)
+         laq_validated(io.commit.uops(w).ldq_idx)     := Bool(true)
+         laq_uop(io.commit.uops(w).ldq_idx).validated := Bool(true)
          printf("This %d has been validated with inst [DASM(%x)]\n", io.commit.uops(w).ldq_idx, io.commit.uops(w).inst)
       }
    }
