@@ -563,7 +563,7 @@ class MemExeUnit(implicit p: Parameters) extends ExecutionUnit(num_rf_read_ports
    // I should be timing forwarding to coincide with dmem resps, so I'm not clobbering
    //anything....
    val memresp_val    = Mux(io.com_exception && io.dmem.resp.bits.uop.is_load && (!io.dmem.resp.bits.uop.validated), Bool(false),
-                                                io.lsu_io.forward_val || io.dmem.resp.valid
+                                                io.lsu_io.forward_val || io.dmem.resp.valid)
    val memresp_rf_wen = (io.dmem.resp.valid && (io.dmem.resp.bits.uop.mem_cmd === M_XRD || io.dmem.resp.bits.uop.is_amo)) ||  // TODO should I refactor this to use is_load?
                            io.lsu_io.forward_val
    val memresp_uop    = Mux(io.lsu_io.forward_val, io.lsu_io.forward_uop,
