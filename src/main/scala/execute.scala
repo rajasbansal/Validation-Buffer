@@ -569,7 +569,7 @@ class MemExeUnit(implicit p: Parameters) extends ExecutionUnit(num_rf_read_ports
 
    when (memresp_val)
    {
-      printf("Receiving try2- %b for [DASM(%x)]\n", memresp_uop.inst)
+      printf("Receiving try2 for [DASM(%x)]\n", memresp_uop.inst)
    }
    io.lsu_io.memresp.valid := memresp_val
    io.lsu_io.memresp.bits  := memresp_uop
