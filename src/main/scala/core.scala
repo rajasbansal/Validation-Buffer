@@ -724,7 +724,7 @@ class BoomCore(implicit p: Parameters, edge: uncore.tilelink2.TLEdgeOut) extends
 
    lsu.io.debug_tsc := debug_tsc_reg
 
-   dc_shim.io.core.flush_pipe := rob.io.flush.valid
+   dc_shim.io.core.flush_pipe := Bool(false)
 
    lsu.io.nack <> dc_shim.io.core.nack
 
