@@ -529,7 +529,7 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
       io.memreq_addr  := exe_ld_addr
       when (will_fire_load_wakeup)
       {
-         exe_ld_uop.validated := Bool(true)
+         io.memreq_uop.validated := Bool(true)
       }
       io.memreq_uop   := exe_ld_uop
       printf("Executing the load id %d and inst [DASM(%x)]\n", exe_ld_uop.ldq_idx, exe_ld_uop.inst)
