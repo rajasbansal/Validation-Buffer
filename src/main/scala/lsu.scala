@@ -850,7 +850,7 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
       .otherwise
       {
          stq_succeeded(io.memresp.bits.stq_idx) := Bool(true)
-
+         printf("Received the memory response from the store id %d for inst DASM(%x)\n", io.memresp.bits.stq_idx, io.memresp.bits.uop.inst)
          if (O3PIPEVIEW_PRINTF)
          {
             // TODO supress printing out a store-comp for lr instructions.
