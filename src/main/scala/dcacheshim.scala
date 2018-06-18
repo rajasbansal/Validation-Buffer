@@ -322,14 +322,14 @@ class DCacheShim(implicit p: Parameters) extends BoomModule()(p)
    val resp_tag = io.dmem.resp.bits.tag
 
    io.core.resp.valid := Mux(cache_load_ack,
-                           !inflight_load_buffer(resp_tag).was_killed, // hide loads that were killed
+                           !inflight_load_buffer(resp_tag).was_killed || (inflight_load_buffer(resp_tag).was_killed && inflight_load_buffer(resp_tag).out_uop.validated), // hide loads that were killed
                          Mux(was_store_and_not_amo && !io.dmem.s2_nack && !Reg(next=io.core.req.bits.kill),
                            Bool(true),    // stores succeed quietly, so valid if no nack
                            Bool(false)))  // filter out nacked responses
    when (cache_load_ack && inflight_load_buffer(resp_tag).was_killed)
    {
       printf("We killed inst [DASM(%x)] and so no response\n",inflight_load_buffer(resp_tag).out_uop.inst)
-      printf("The validated of this uop is %d\n", inflight_load_buffer(resp_tag).out_uop.validated)
+      printf("The validated of this uop is %d and this gave the response %d\n", inflight_load_buffer(resp_tag).out_uop.validated,(inflight_load_buffer(resp_tag).was_killed && inflight_load_buffer(resp_tag).out_uop.validated))
    }
    val m2_req_valid = was_store_and_not_amo && !io.dmem.s2_nack && !RegNext(io.core.req.bits.kill)
    io.core.resp.bits.uop := Mux(m2_req_valid, m2_req_uop, inflight_load_buffer(resp_tag).out_uop)
