@@ -527,7 +527,7 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
    {
       io.memreq_val   := Bool(true)
       io.memreq_addr  := exe_ld_addr
-      val new_uop = exe_ld_uop
+      val new_uop = Wire(init=exe_ld_uop)
       when (will_fire_load_wakeup)
       {
          new_uop.validated := Bool(true)
