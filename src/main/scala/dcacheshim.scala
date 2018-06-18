@@ -326,7 +326,10 @@ class DCacheShim(implicit p: Parameters) extends BoomModule()(p)
                          Mux(was_store_and_not_amo && !io.dmem.s2_nack && !Reg(next=io.core.req.bits.kill),
                            Bool(true),    // stores succeed quietly, so valid if no nack
                            Bool(false)))  // filter out nacked responses
-
+   when (cache_load_ack && inflight_load_buffer(resp_tag).was_killed)
+   {
+      printf("We killed inst [DASM(%x)] and so no response\n",inflight_load_buffer(resp_tag))
+   }
    val m2_req_valid = was_store_and_not_amo && !io.dmem.s2_nack && !RegNext(io.core.req.bits.kill)
    io.core.resp.bits.uop := Mux(m2_req_valid, m2_req_uop, inflight_load_buffer(resp_tag).out_uop)
 
