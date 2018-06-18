@@ -331,7 +331,7 @@ class DCacheShim(implicit p: Parameters) extends BoomModule()(p)
       printf("We killed inst [DASM(%x)] and so no response\n",inflight_load_buffer(resp_tag).out_uop)
    }
    val m2_req_valid = was_store_and_not_amo && !io.dmem.s2_nack && !RegNext(io.core.req.bits.kill)
-   io.core.resp.bits.uop := Mux(m2_req_valid, m2_req_uop, inflight_load_buffer(resp_tag).out_uop)
+   io.core.resp.bits.uop := Mux(m2_req_valid, m2_req_uop, inflight_load_buffer(resp_tag).out_uop.inst)
 
    assert (!(cache_load_ack && m2_req_valid), "[dcshim] Two responding uops are conflicting.")
 
