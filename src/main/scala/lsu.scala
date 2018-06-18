@@ -528,10 +528,7 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
       io.memreq_val   := Bool(true)
       io.memreq_addr  := exe_ld_addr
       val new_uop = Wire(init=exe_ld_uop)
-      when (will_fire_load_wakeup)
-      {
-         new_uop.validated := Bool(true)
-      }
+      new_uop.validated := will_fire_load_wakeup
       io.memreq_uop   := new_uop
       printf("Executing the load id %d and inst [DASM(%x)]\n", exe_ld_uop.ldq_idx, exe_ld_uop.inst)
       laq_executed(exe_ld_uop.ldq_idx) := Bool(true)
