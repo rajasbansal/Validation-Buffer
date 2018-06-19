@@ -770,7 +770,7 @@ class BoomCore(implicit p: Parameters, edge: uncore.tilelink2.TLEdgeOut) extends
             wbresp.ready := iregfile.io.write_ports(w_cnt).ready
             when (wbIsValid(RT_FIX))
             {
-               printf("Writing in the register %d inst DASM(%x)", wbpdst, wbresp.bits.uop.inst)
+               printf("Writing in the register %d inst DASM(%x)\n", wbpdst, wbresp.bits.uop.inst)
             }
          }
          else if (exe_units(i).is_mem_unit)
