@@ -1045,9 +1045,9 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
    // io.emit_validated_st.valid := can_fire_store_commit
    // io.emit_validated_st.valid := (will_fire_sta_incoming && !saq_is_virtual(io.exe_resp.bits.uop.stq_idx)) || (will_fire_sta_retry && !saq_is_virtual(stq_retry_idx))
    // io.emit_validated_st.bits.rob_idx := stq_uop(stq_execute_head).rob_idx
-   io.emit_validated_st.valid := mem_fired_sta && !mem_tlb_miss
+   io.emit_validated_st.valid := clr_bsy_valid
    // io.emit_validated_st.bits.rob_idx := Mux(will_fire_sta_incoming, io.exe_resp.bits.uop.rob_idx, stq_uop(stq_retry_idx).rob_idx)
-   io.emit_validated_st.bits.rob_idx := mem_tlb_uop.rob_idx
+   io.emit_validated_st.bits.rob_idx := clr_bsy_robidx
    if (DEBUG_VB){ 
       when (io.emit_validated_st.valid) {
          printf("\n---- This store has been validated %d\n", io.emit_validated_st.bits.rob_idx)
