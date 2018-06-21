@@ -1034,7 +1034,7 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
    io.xcpt.bits := r_xcpt
    // Emit the validated changes
    // val isValidated = Reg(next = io.exe_resp.valid && dtlb.io.req.valid,init = false)
-   io.emit_validated_ld.valid := will_fire_load_wakeup 
+   io.emit_validated_ld.valid := will_fire_load_wakeup && !laq_is_uncacheable(exe_ld_idx_wakeup)
    io.emit_validated_ld.bits.rob_idx := laq_uop(exe_ld_idx_wakeup).rob_idx
    if (DEBUG_VB){   
       when (io.emit_validated_ld.valid) {
