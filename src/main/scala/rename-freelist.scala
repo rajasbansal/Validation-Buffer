@@ -261,6 +261,7 @@ class RenameFreeListHelper(
       .elsewhen (io.rollback_wens(w))
       {
          enq_mask(w) := UInt(1) << io.rollback_pdsts(w)
+         pending_readers_list(io.rollback_pdsts(w)) := UInt(0)
       }
    }
 

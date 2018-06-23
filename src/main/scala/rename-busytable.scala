@@ -41,6 +41,11 @@ class BusyTableIo(
    val table_bsy      = Vec(num_pregs, Bool()).asOutput
 
    val debug = new Bundle { val busytable= Bits(width=num_pregs).asOutput }
+
+   // for marking the rollback registers as not busy
+   val com_uops   = Vec(pipeline_width, new MicroOp()).asInput
+   // Valids for above
+   val com_rbk_valids = Vec(pipeline_width, Bool()).asInput
 }
 
 // Register P0 is always NOT_BUSY, and cannot be set to BUSY
@@ -86,6 +91,13 @@ class BusyTableHelper(
       io.p_rs_busy(ridx) := (table_bsy(io.p_rs(ridx)) && !just_cleared)
    }
 
+   for (w <- 0 until pipeline_width)
+   {
+      when (io.com_rbk_valids(w))
+      {
+         table_bsy(io.com_uops(w).pdst) := NOT_BUSY
+      }
+   }
    io.debug.busytable := table_bsy.toBits
 
    io.table_bsy := table_bsy
@@ -127,6 +139,11 @@ class BusyTable(
       val table_bsy      = Vec(num_pregs, Bool()).asOutput
 
       val debug                 = new Bundle { val busytable= Bits(width=num_pregs).asOutput }
+
+      // for marking the rollback registers as not busy
+      val com_uops   = Vec(pl_width, new MicroOp()).asInput
+      // Valids for above
+      val com_rbk_valids = Vec(pl_width, Bool()).asInput
    }
 
    val busy_table = Module(new BusyTableHelper(
@@ -135,7 +152,8 @@ class BusyTable(
       num_read_ports = num_read_ports,
       num_wb_ports = num_wb_ports))
 
-
+   busy_table.io.com_uops := io.com_uops
+   busy_table.io.com_rbk_valids := io.com_rbk_valids
    // figure out if we need to bypass a newly allocated physical register from a previous instruction in this cycle.
    val prs1_was_bypassed = Wire(init = Vec.fill(pl_width) {Bool(false)})
    val prs2_was_bypassed = Wire(init = Vec.fill(pl_width) {Bool(false)})
