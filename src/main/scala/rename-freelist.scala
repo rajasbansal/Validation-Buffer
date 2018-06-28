@@ -262,6 +262,7 @@ class RenameFreeListHelper(
       {
          enq_mask(w) := UInt(1) << io.rollback_pdsts(w)
          pending_readers_list(io.rollback_pdsts(w)) := UInt(0)
+         printf("Changing the register %d to 0", io.rollback_pdsts(w))
       }
    }
 
