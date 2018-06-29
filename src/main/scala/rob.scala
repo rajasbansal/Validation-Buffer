@@ -412,7 +412,7 @@ class Rob(width: Int,
          rob_fflags(rob_tail)    := Bits(0)
          rob_uop(rob_tail).stat_brjmp_mispredicted := Bool(false)
 
-         rob_validated(rob_tail) := !(io.enq_uops(w).is_store || io.enq_uops(w).is_load || io.enq_uops(w).is_amo || io.enq_uops(w).is_fencei || io.enq_uops(w).is_fence || io.enq_uops(w).is_br_or_jmp || io.enq_uops(w).flush_on_commit || io.enq_uops(w).is_unique || ( io.enq_uops(w).func_unit === UInt(2) ))
+         rob_validated(rob_tail) := !(io.enq_uops(w).is_store || io.enq_uops(w).is_load || io.enq_uops(w).is_amo || io.enq_uops(w).is_fencei || io.enq_uops(w).is_fence || io.enq_uops(w).is_br_or_jmp || io.enq_uops(w).flush_on_commit || io.enq_uops(w).is_unique || ( io.enq_uops(w).fu_code === FU_BRU ))
          
          assert (rob_val(rob_tail) === Bool(false),"[rob] overwriting a valid entry.")
          assert ((io.enq_uops(w).rob_idx >> log2Ceil(width)) === rob_tail)
