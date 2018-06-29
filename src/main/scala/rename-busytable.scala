@@ -47,8 +47,8 @@ class BusyTableIo(
    // Valids for above
    val com_rbk_valids = Vec(pipeline_width, Bool()).asInput
 
-   val free_busy      = UInt(width = num_pregs)
-   val see_free       = Bool()
+   val free_busy      = UInt(INPUT,num_pregs)
+   val see_free       = Bool(INPUT)
 }
 
 // Register P0 is always NOT_BUSY, and cannot be set to BUSY
@@ -156,7 +156,7 @@ class BusyTable(
       // Valids for above
       val com_rbk_valids = Vec(pl_width, Bool()).asInput
 
-      val free_busy      = UInt(width = num_pregs)
+      val free_busy      = UInt(INPUT, num_pregs)
       val see_free       = Bool()
    }
 
