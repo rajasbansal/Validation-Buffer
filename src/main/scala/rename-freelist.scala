@@ -70,6 +70,9 @@ class FreeListIo(num_phys_registers: Int, pl_width: Int, size1: Int, size2: Int)
 
    val table_bsy      = Vec(num_phys_registers, Bool()).asInput
 
+   val free_busy      = UInt(width = num_phys_registers)
+   val see_free       = Bool()
+
    val debug = new DebugFreeListIO(num_phys_registers).asOutput
 }
 
@@ -279,12 +282,13 @@ class RenameFreeListHelper(
    //merge misspeculated allocation_list with free_list
    val allocation_list = Wire(Bits(width = num_phys_registers))
    allocation_list := allocation_lists(io.br_mispredict_tag)
-
+   io.see_free := io.br_mispredict_val
    when (io.br_mispredict_val)
    {
       // include newly freed register as well!
       free_list := allocation_list | free_list | (enq_mask.reduce(_|_))
       valid_remapping_list := valid_remapping_list |  allocation_list | (enq_mask.reduce(_|_))
+      io.free_busy := (valid_remapping_list |  allocation_list | (enq_mask.reduce(_|_))) & (~valid_remapping_list)
       // set other branch allocation_lists to zero where allocation_list(j) == 1...
       for (i <- 0 until MAX_BR_COUNT)
       {
@@ -392,6 +396,9 @@ class RenameFreeList(
 
       val debug            = new DebugFreeListIO(num_phys_registers).asOutput
       val debug_rob_empty  = Bool(INPUT)
+
+      val free_busy      = UInt(width = num_phys_registers)
+      val see_free       = Bool()
    }
 
    val freelist = Module(new RenameFreeListHelper(
@@ -547,6 +554,8 @@ class RenameFreeList(
    io.can_allocate := freelist.io.can_allocate
    io.debug := freelist.io.debug
    freelist.io.table_bsy := io.table_bsy
+   freelist.io.see_free := io.see_free
+   freelist.io.free_busy := io.free_busy
 
    when (io.debug_rob_empty) {
       assert (PopCount(freelist.io.debug.freelist) >= UInt(num_phys_registers - 32),

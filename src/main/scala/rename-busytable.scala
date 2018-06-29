@@ -46,6 +46,9 @@ class BusyTableIo(
    val com_uops   = Vec(pipeline_width, new MicroOp()).asInput
    // Valids for above
    val com_rbk_valids = Vec(pipeline_width, Bool()).asInput
+
+   val free_busy      = UInt(width = num_pregs)
+   val see_free       = Bool()
 }
 
 // Register P0 is always NOT_BUSY, and cannot be set to BUSY
@@ -98,6 +101,14 @@ class BusyTableHelper(
          table_bsy(io.com_uops(w).pdst) := NOT_BUSY
       }
    }
+
+   when (io.see_free)
+   {
+      for (i <- 0 until num_pregs)
+      {
+         table_bsy(i) := table_bsy(i) & (~io.free_busy(i)).toBool
+      }
+   }
    io.debug.busytable := table_bsy.toBits
 
    io.table_bsy := table_bsy
@@ -144,6 +155,9 @@ class BusyTable(
       val com_uops   = Vec(pl_width, new MicroOp()).asInput
       // Valids for above
       val com_rbk_valids = Vec(pl_width, Bool()).asInput
+
+      val free_busy      = UInt(width = num_pregs)
+      val see_free       = Bool()
    }
 
    val busy_table = Module(new BusyTableHelper(
@@ -209,6 +223,9 @@ class BusyTable(
       busy_table.io.unbusy_pdst(i).valid := io.wb_valids(i)
       busy_table.io.unbusy_pdst(i).bits  := io.wb_pdsts(i)
    }
+
+   busy_table.io.see_free := io.see_free
+   busy_table.io.free_busy := io.free_busy
 
    // scalastyle:on
    io.debug := busy_table.io.debug
