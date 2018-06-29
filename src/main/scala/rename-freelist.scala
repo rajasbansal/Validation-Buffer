@@ -554,8 +554,8 @@ class RenameFreeList(
    io.can_allocate := freelist.io.can_allocate
    io.debug := freelist.io.debug
    freelist.io.table_bsy := io.table_bsy
-   freelist.io.see_free := io.see_free
-   freelist.io.free_busy := io.free_busy
+   io.see_free := freelist.io.see_free
+   io.free_busy := freelist.io.free_busy
 
    when (io.debug_rob_empty) {
       assert (PopCount(freelist.io.debug.freelist) >= UInt(num_phys_registers - 32),
