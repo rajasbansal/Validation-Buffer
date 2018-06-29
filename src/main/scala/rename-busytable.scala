@@ -157,7 +157,7 @@ class BusyTable(
       val com_rbk_valids = Vec(pl_width, Bool()).asInput
 
       val free_busy      = UInt(INPUT, num_pregs)
-      val see_free       = Bool()
+      val see_free       = Bool(INPUT)
    }
 
    val busy_table = Module(new BusyTableHelper(
