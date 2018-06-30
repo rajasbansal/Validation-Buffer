@@ -1092,6 +1092,7 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
          {
             laq_allocated(i)   := Bool(false)
             laq_addr_val(i)    := Bool(false)
+            laq_completed(i)   := Bool(true)
          }
       }
    }
