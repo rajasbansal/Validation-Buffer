@@ -70,6 +70,14 @@ class BusyTableHelper(
    //TODO BUG chisel3
    val table_bsy = Reg(init=Vec.fill(num_pregs){Bool(false)})
 
+   when (io.see_free)
+   {
+      for (i <- 0 until num_pregs)
+      {
+         table_bsy(i) := table_bsy(i) & (~io.free_busy(i)).toBool
+      }
+   }
+
    for (wb_idx <- 0 until num_wb_ports)
    {
       when (io.unbusy_pdst(wb_idx).valid)
@@ -102,13 +110,6 @@ class BusyTableHelper(
       }
    }
 
-   when (io.see_free)
-   {
-      for (i <- 0 until num_pregs)
-      {
-         table_bsy(i) := table_bsy(i) & (~io.free_busy(i)).toBool
-      }
-   }
    io.debug.busytable := table_bsy.toBits
 
    io.table_bsy := table_bsy
