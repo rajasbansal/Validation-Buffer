@@ -72,6 +72,7 @@ class BusyTableHelper(
 
    when (io.see_free)
    {
+      print("I am at the free place")
       for (i <- 0 until num_pregs)
       {
          table_bsy(i) := table_bsy(i) & (~io.free_busy(i)).toBool
