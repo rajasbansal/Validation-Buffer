@@ -1178,7 +1178,7 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
       val row_idx = (wb_uop.ldq_idx)
       when (wb_resp.valid && wb_uop.is_load)
       {
-         printf("The load has been completed\n")
+         printf("The load has been completed %d\n", row_idx)
          laq_completed(row_idx) := Bool(true)
          assert (laq_allocated(row_idx), "[lsu] trying to commit an un-allocated load entry.")
          assert (laq_executed(row_idx), "[lsu] trying to commit an un-executed load entry.")
