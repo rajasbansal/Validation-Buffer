@@ -866,7 +866,8 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
    {
       when (io.commit.valids(w) && io.commit.uops(w).is_load)
       {
-         laq_validated(io.commit.uops(w).ldq_idx)     := Bool(true)
+         val row_idx = io.commit.uops(w).ldq_idx
+         laq_validated(row_idx)     := Bool(true)
          laq_uop(io.commit.uops(w).ldq_idx).validated := Bool(true)
          // assert (laq_allocated(row_idx), "[lsu] trying to commit an un-allocated load entry.")
          // assert (laq_executed(row_idx), "[lsu] trying to commit an un-executed load entry.")
