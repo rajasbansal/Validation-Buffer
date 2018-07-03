@@ -868,6 +868,17 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
       {
          laq_validated(io.commit.uops(w).ldq_idx)     := Bool(true)
          laq_uop(io.commit.uops(w).ldq_idx).validated := Bool(true)
+         // assert (laq_allocated(row_idx), "[lsu] trying to commit an un-allocated load entry.")
+         // assert (laq_executed(row_idx), "[lsu] trying to commit an un-executed load entry.")
+         // assert (laq_succeeded(row_idx) || (io.memresp.valid && io.memresp.bits.is_load && (row_idx === io.memresp.bits.ldq_idx)), "[lsu] trying to commit an un-succeeded load entry.")
+
+         laq_allocated(row_idx)         := Bool(false)
+         laq_addr_val (row_idx)         := Bool(false)
+         laq_executed (row_idx)         := Bool(false)
+         laq_succeeded(row_idx)         := Bool(false)
+         laq_failure  (row_idx)         := Bool(false)
+         laq_forwarded_std_val(row_idx) := Bool(false)
+
          printf("This %d has been validated with inst [DASM(%x)]\n", io.commit.uops(w).ldq_idx, io.commit.uops(w).inst)
       }
    }
@@ -1093,6 +1104,7 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
             laq_allocated(i)   := Bool(false)
             laq_addr_val(i)    := Bool(false)
             laq_completed(i)   := Bool(true)
+            laq_validated(i)   := Bool(true)
          }
       }
    }
@@ -1185,16 +1197,16 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
          assert (laq_executed(row_idx), "[lsu] trying to commit an un-executed load entry.")
          assert (laq_succeeded(row_idx) || (io.memresp.valid && io.memresp.bits.is_load && (row_idx === io.memresp.bits.ldq_idx)), "[lsu] trying to commit an un-succeeded load entry.")
 
-         laq_allocated(row_idx)         := Bool(false)
-         laq_addr_val (row_idx)         := Bool(false)
-         laq_executed (row_idx)         := Bool(false)
-         laq_succeeded(row_idx)         := Bool(false)
-         laq_failure  (row_idx)         := Bool(false)
-         laq_forwarded_std_val(row_idx) := Bool(false)
+         // laq_allocated(row_idx)         := Bool(false)
+         // laq_addr_val (row_idx)         := Bool(false)
+         // laq_executed (row_idx)         := Bool(false)
+         // laq_succeeded(row_idx)         := Bool(false)
+         // laq_failure  (row_idx)         := Bool(false)
+         // laq_forwarded_std_val(row_idx) := Bool(false)
          // laq_completed(row_idx)         := Bool(false)
       }
    }
-   laq_head := Mux((laq_head =/= laq_tail) && laq_completed(laq_head), WrapInc(laq_head, num_ld_entries), laq_head)
+   laq_head := Mux((laq_head =/= laq_tail) && laq_validated(laq_head), WrapInc(laq_head, num_ld_entries), laq_head)
 
 
    //-------------------------------------------------------------
@@ -1316,6 +1328,7 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
                laq_allocated(i)   := Bool(false)
                laq_executed(i)    := Bool(false)
                laq_completed(i)   := Bool(true)
+               laq_validated(i)   := Bool(true)
             }
          }
       }
