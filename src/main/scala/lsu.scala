@@ -1177,7 +1177,7 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
       val wb_resp = io.wb_resps(i)
       val wb_uop = wb_resp.bits.uop
       val row_idx = (wb_uop.ldq_idx)
-      when (wb_resp.valid && wb_uop.is_load && (wb_resp.bits.uop.inst === laq_uop(row_idx).inst))
+      when (wb_resp.valid && wb_uop.is_load && (wb_resp.bits.uop.inst === laq_uop(row_idx).inst) && laq_allocated(row_idx))
       {
          printf("The load has been completed %d\n", row_idx)
          laq_completed(row_idx) := Bool(true)
@@ -1194,7 +1194,7 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
          // laq_completed(row_idx)         := Bool(false)
       }
    }
-   laq_head := Mux((laq_head =/= laq_tail) && laq_completed(laq_head), WrapInc(laq_head, num_ld_entries), laq_head)
+   laq_head := Mux((laq_head =/= laq_tail || laq_is_full) && laq_completed(laq_head), WrapInc(laq_head, num_ld_entries), laq_head)
 
 
    //-------------------------------------------------------------
