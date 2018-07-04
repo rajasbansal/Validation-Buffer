@@ -1194,7 +1194,7 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
          // laq_completed(row_idx)         := Bool(false)
       }
    }
-   laq_head := Mux((laq_head =/= laq_tail || laq_is_full) && laq_completed(laq_head), WrapInc(laq_head, num_ld_entries), laq_head)
+   laq_head := Mux((laq_head =/= laq_tail || io.laq_full) && laq_completed(laq_head), WrapInc(laq_head, num_ld_entries), laq_head)
 
 
    //-------------------------------------------------------------
