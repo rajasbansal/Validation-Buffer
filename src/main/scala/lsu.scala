@@ -1207,9 +1207,18 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
    //       // laq_completed(row_idx)         := Bool(false)
    //    }
    // }
-   laq_head := Mux((laq_head =/= laq_tail) && laq_validated(laq_head), WrapInc(laq_head, num_ld_entries), laq_head)
-
-
+   // laq_head := Mux((laq_head =/= laq_tail) && laq_validated(laq_head), WrapInc(laq_head, num_ld_entries), laq_head)
+   var temp_laq_head = laq_head
+   var cont_inc = Bool(true)
+   for (w <- 0 until num_ld_entries)
+   {
+      when (cont_inc)
+      {
+         temp_laq_head = Mux(laq_validated(temp_laq_head), WrapInc(temp_laq_head, num_ld_entries), temp_laq_head)
+         cont_inc = laq_validated(temp_laq_head)
+      }
+   }
+   laq_head := temp_laq_head
    //-------------------------------------------------------------
    // Handle Nacks
    // the data cache may nack our requests, requiring us to resend our request,
