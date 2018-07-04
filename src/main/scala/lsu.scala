@@ -1185,28 +1185,28 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
    // }
    // laq_head := temp_laq_head
 
-   for (i <- 0 until num_wakeup_ports)
-   {
-      val wb_resp = io.wb_resps(i)
-      val wb_uop = wb_resp.bits.uop
-      val row_idx = (wb_uop.ldq_idx)
-      when (wb_resp.valid && wb_uop.is_load)
-      {
-         printf("The load has been completed %d\n", row_idx)
-         laq_completed(row_idx) := Bool(true)
-         assert (laq_allocated(row_idx), "[lsu] trying to commit an un-allocated load entry.")
-         assert (laq_executed(row_idx), "[lsu] trying to commit an un-executed load entry.")
-         assert (laq_succeeded(row_idx) || (io.memresp.valid && io.memresp.bits.is_load && (row_idx === io.memresp.bits.ldq_idx)), "[lsu] trying to commit an un-succeeded load entry.")
+   // for (i <- 0 until num_wakeup_ports)
+   // {
+   //    val wb_resp = io.wb_resps(i)
+   //    val wb_uop = wb_resp.bits.uop
+   //    val row_idx = (wb_uop.ldq_idx)
+   //    when (wb_resp.valid && wb_uop.is_load)
+   //    {
+   //       printf("The load has been completed %d\n", row_idx)
+   //       laq_completed(row_idx) := Bool(true)
+   //       assert (laq_allocated(row_idx), "[lsu] trying to commit an un-allocated load entry.")
+   //       assert (laq_executed(row_idx), "[lsu] trying to commit an un-executed load entry.")
+   //       assert (laq_succeeded(row_idx) || (io.memresp.valid && io.memresp.bits.is_load && (row_idx === io.memresp.bits.ldq_idx)), "[lsu] trying to commit an un-succeeded load entry.")
 
-         // laq_allocated(row_idx)         := Bool(false)
-         // laq_addr_val (row_idx)         := Bool(false)
-         // laq_executed (row_idx)         := Bool(false)
-         // laq_succeeded(row_idx)         := Bool(false)
-         // laq_failure  (row_idx)         := Bool(false)
-         // laq_forwarded_std_val(row_idx) := Bool(false)
-         // laq_completed(row_idx)         := Bool(false)
-      }
-   }
+   //       // laq_allocated(row_idx)         := Bool(false)
+   //       // laq_addr_val (row_idx)         := Bool(false)
+   //       // laq_executed (row_idx)         := Bool(false)
+   //       // laq_succeeded(row_idx)         := Bool(false)
+   //       // laq_failure  (row_idx)         := Bool(false)
+   //       // laq_forwarded_std_val(row_idx) := Bool(false)
+   //       // laq_completed(row_idx)         := Bool(false)
+   //    }
+   // }
    laq_head := Mux((laq_head =/= laq_tail) && laq_validated(laq_head), WrapInc(laq_head, num_ld_entries), laq_head)
 
 
