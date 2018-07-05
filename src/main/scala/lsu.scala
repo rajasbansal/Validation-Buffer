@@ -864,7 +864,7 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
 
    for (w <- 0 until 2)
    {
-      when (io.commit.valids(w) && io.commit.uops(w).is_load)
+      when (io.commit.valids(w) && io.commit.uops(w).is_load && io.commit.uops(w).inst === laq_uop(io.commit.uops(w).ldq_idx).inst)
       {
          laq_validated(io.commit.uops(w).ldq_idx)     := Bool(true)
          laq_uop(io.commit.uops(w).ldq_idx).validated := Bool(true)
