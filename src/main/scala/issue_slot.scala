@@ -210,7 +210,7 @@ class IssueSlot(num_slow_wakeup_ports: Int)(implicit p: Parameters) extends Boom
          wasKilled := Bool(true)
          printf("There was a mispredict for DASM(%x) with r1 as %d and r2 as %d with grant %b\n",slotUop.inst,slotUop.pop1, slotUop.pop2, io.grant)
       }
-      .elsewhen (isValid && io.grant && (state === s_valid_2) && (slotUop.uopc !== uopSTD))
+      .elsewhen (isValid && io.grant && (slot_state === s_valid_2) && (slotUop.uopc !== uopSTD))
       {
          wasKilled := Bool(true)
       }
