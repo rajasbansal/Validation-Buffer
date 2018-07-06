@@ -118,6 +118,8 @@ class RenameFreeListHelper(
    // TODO why is this a Vec? can I do this all on one bit-vector?
    val enq_mask = Wire(Vec(pl_width, Bits(width = num_phys_registers)))
 
+   val used_for_long = Reg(init = Vec.fill(num_phys_registers){UInt(0,8)})
+
    // ------------------------------------------
    // find new,free physical registers
 
@@ -337,6 +339,21 @@ class RenameFreeListHelper(
       when (newfree_list(i) === UInt(0))
       {
          printf(i+" register is not free :( %d and %d and pending readers %d\n",valid_remapping_list(i), io.table_bsy(i), pending_readers_list(i))
+      }
+   }
+
+   // hack for reclaiming a register if it has been not free for too long
+   for ( i <- 1 until num_phys_registers)
+   {
+      when (!io.table_bsy(i) && valid_remapping_list(i) && (pending_readers_list(i) != UInt(0)))
+      {
+         printf("Had to reclaim because unused for too long\n")
+         used_for_long(i) := used_for_long(i) + UInt(1)
+         when (used_for_long(i) === UInt(200))
+         {
+            used_for_long(i) := UInt(0)
+            pending_readers_list(i) := UInt(0)
+         }
       }
    }
    // newfree_list := io.table_bsy.toBits & valid_remapping_list & Vec(pending_readers_list.map({case(v) => v === UInt(0)})).toBits
