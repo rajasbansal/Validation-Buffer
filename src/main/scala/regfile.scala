@@ -88,6 +88,7 @@ class RegisterFileBehavorial(
    val regfile = Mem(num_registers, UInt(width=register_width))
    for (w <- 0 until 11)
    {
+      if (DEBUG_VB)
       printf("Register "+ w + " has the value %x\n", regfile(w))
    }
 

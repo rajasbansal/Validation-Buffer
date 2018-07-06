@@ -180,6 +180,7 @@ class RenameFreeListHelper(
        //   }
          // pending_readers_list(io.pending_readers_regs(w)) := pending_readers_list(io.pending_readers_regs(w)) + templist.reduce(_+_)
          // pending_readers_list(io.pending_readers_regs(w)) := pending_readers_list(io.pending_readers_regs(w)) + Vec((io.pending_readers_regs zip io.pending_readers_vals) map {case (v,val_bit) => (v === io.pending_readers_regs(w)) && val_bit}).count({case (v) => v}) - Vec((io.done_readers_regs zip io.done_readers_vals) map {case (v,val_bit) => (v === io.pending_readers_regs(w)) && val_bit}).count({case (v) => v})
+         if (DEBUG_VB)
          printf("Increasing the pending readers of %d with value %d\n", io.pending_readers_regs(w), pending_readers_list(io.pending_readers_regs(w)))
       }
    }
@@ -189,6 +190,7 @@ class RenameFreeListHelper(
       when (io.done_readers_vals(w))
       {
          // pending_readers_list(io.done_readers_regs(w)) := pending_readers_list(io.done_readers_regs(w)) + Vec((io.pending_readers_regs zip io.pending_readers_vals) map {case (v,val_bit) => (v === io.done_readers_regs(w)) && val_bit}).count({case (v) => v}) - Vec((io.done_readers_regs zip io.done_readers_vals) map {case (v,val_bit) => (v === io.done_readers_vals(w)) && val_bit}).count({case (v) => v})
+         if (DEBUG_VB)
          printf("Decreasing the pending readers of %d with value %d\n", io.done_readers_regs(w), pending_readers_list(io.done_readers_regs(w)))
       }
    }
@@ -210,6 +212,7 @@ class RenameFreeListHelper(
       // }
       if (i==2||i==1||i==0)
       {
+         if (DEBUG_VB)
          printf(i+"- Add %d Subtract %d Mem %d Int %d FP %d\n",Vec((io.pending_readers_regs zip io.pending_readers_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v}),Vec((io.done_readers_regs zip io.done_readers_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v}),(Vec((io.mis_mem_regs zip io.mis_mem_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v})),(Vec((io.mis_int_regs zip io.mis_int_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v})),(Vec((io.mis_fp_regs zip io.mis_fp_vals) map {case (v,val_bit) => (v === UInt(i)) && val_bit}).count({case (v) => v})))
       }
       // printf(i+"- Add %d Subtract %d\n",Vec((io.pending_readers_regs zip io.pending_readers_vals) map {case (v,val_bit) => (v === i) && val_bit}).count({case (v) => v}),Vec((io.done_readers_regs zip io.done_readers_vals) map {case (v,val_bit) => (v === i) && val_bit}).count({case (v) => v}))
@@ -267,6 +270,7 @@ class RenameFreeListHelper(
       {
          enq_mask(w) := UInt(1) << io.rollback_pdsts(w)
          pending_readers_list(io.rollback_pdsts(w)) := UInt(0)
+         if (DEBUG_VB)
          printf("Changing the register %d to 0", io.rollback_pdsts(w))
       }
    }
@@ -338,6 +342,7 @@ class RenameFreeListHelper(
    {
       when (newfree_list(i) === UInt(0))
       {
+         if (DEBUG_VB)
          printf(i+" register is not free :( %d and %d and pending readers %d\n",valid_remapping_list(i), io.table_bsy(i), pending_readers_list(i))
       }
    }
@@ -347,6 +352,7 @@ class RenameFreeListHelper(
    {
       when (!io.table_bsy(i) && valid_remapping_list(i) && (pending_readers_list(i) != UInt(0)))
       {
+         if (DEBUG_VB)
          printf("Had to reclaim because unused for too long\n")
          used_for_long(i) := used_for_long(i) + UInt(1)
          when (used_for_long(i) === UInt(200))
@@ -469,18 +475,22 @@ class RenameFreeList(
 
       when (io.pending_readers(w).valid && (io.pending_readers(w).bits.lrs1_rtype === UInt(rtype)))
       {
+         if (DEBUG_VB)
       	printf("RegisterSource1 is %d for [DASM(%x)]\n",io.pending_readers(w).bits.pop1,io.pending_readers(w).bits.inst)
       }
    	when (io.pending_readers(w).valid && (io.pending_readers(w).bits.lrs2_rtype === UInt(rtype)))
       {
+         if (DEBUG_VB)
       	printf("RegisterSource2 is %d for [DASM(%x)]\n",io.pending_readers(w).bits.pop2,io.pending_readers(w).bits.inst)
       }
    	when (io.pending_readers(w).valid && (io.pending_readers(w).bits.frs3_en))
       {
+         if (DEBUG_VB)
       	printf("RegisterSource3 is %d for [DASM(%x)]\n",io.pending_readers(w).bits.pop3,io.pending_readers(w).bits.inst)
       }
    	when (io.pending_readers(w).valid && (io.pending_readers(w).bits.lrs1_rtype === RT_PAS))
       {
+         if (DEBUG_VB)
       	printf("Pass Through Register is %d for [DASM(%x)]\n",io.pending_readers(w).bits.pop1,io.pending_readers(w).bits.inst)
       }
    }
@@ -495,14 +505,17 @@ class RenameFreeList(
       freelist.io.done_readers_regs(w + (size1 + size2) * 2) := io.pending_done_1(w).bits.pop3
       when (io.pending_done_1(w).valid && (io.pending_done_1(w).bits.lrs1_rtype === UInt(rtype)))
       {
+         if (DEBUG_VB)
          printf("Decrement register1 %d for [DASM(%x)]\n",io.pending_done_1(w).bits.pop1,io.pending_done_1(w).bits.inst)
       }
       when (io.pending_done_1(w).valid && (io.pending_done_1(w).bits.lrs2_rtype === UInt(rtype)))
       {
+         if (DEBUG_VB)
          printf("Decrement register2 %d for [DASM(%x)]\n",io.pending_done_1(w).bits.pop2,io.pending_done_1(w).bits.inst)
       }
       when (io.pending_done_1(w).valid && (io.pending_done_1(w).bits.frs3_en))
       {
+         if (DEBUG_VB)
          printf("Decrement register3 %d for [DASM(%x)]\n",io.pending_done_1(w).bits.pop3,io.pending_done_1(w).bits.inst)
       }
    }
@@ -517,14 +530,17 @@ class RenameFreeList(
       freelist.io.done_readers_regs(size1 + w + (size1 + size2) * 2) := io.pending_done_2(w).bits.pop3
       when (io.pending_done_2(w).valid && (io.pending_done_2(w).bits.lrs1_rtype === UInt(rtype)))
       {
+         if (DEBUG_VB)
          printf("Decrement register1 %d for [DASM(%x)]\n",io.pending_done_2(w).bits.pop1,io.pending_done_2(w).bits.inst)
       }
       when (io.pending_done_2(w).valid && (io.pending_done_2(w).bits.lrs2_rtype === UInt(rtype)))
       {
+         if (DEBUG_VB)
          printf("Decrement register2 %d for [DASM(%x)]\n",io.pending_done_2(w).bits.pop2,io.pending_done_2(w).bits.inst)
       }
       when (io.pending_done_2(w).valid && (io.pending_done_2(w).bits.frs3_en))
       {
+         if (DEBUG_VB)
          printf("Decrement register3 %d for [DASM(%x)]\n",io.pending_done_2(w).bits.pop3,io.pending_done_2(w).bits.inst)
       }
    }

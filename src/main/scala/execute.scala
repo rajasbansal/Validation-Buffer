@@ -554,10 +554,12 @@ class MemExeUnit(implicit p: Parameters) extends ExecutionUnit(num_rf_read_ports
 
    when (io.lsu_io.memreq_uop.is_load && io.lsu_io.memreq_val)
    {
+      if (DEBUG_VB)
       printf("Receiving try1- %b for [DASM(%x)]\n", io.lsu_io.memreq_uop.validated, io.lsu_io.memreq_uop.inst)
    }
    when (io.lsu_io.memreq_kill)
    {
+      if (DEBUG_VB)
       printf("We killed [DASM(%x)]", io.lsu_io.memreq_uop.inst)
    }
   
@@ -573,6 +575,7 @@ class MemExeUnit(implicit p: Parameters) extends ExecutionUnit(num_rf_read_ports
 
    when (memresp_val)
    {
+      if (DEBUG_VB)
       printf("Receiving try2 for [DASM(%x)]\n", memresp_uop.inst)
    }
    io.lsu_io.memresp.valid := memresp_val

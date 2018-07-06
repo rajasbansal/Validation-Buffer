@@ -85,6 +85,7 @@ class IssueSlot(num_slow_wakeup_ports: Int)(implicit p: Parameters) extends Boom
       
       when (isValid)
       {
+         if (DEBUG_VB)
          printf("--- There was a pipeline flush\n")
       }
       when (isValid && !slotUop.validated)
@@ -94,6 +95,7 @@ class IssueSlot(num_slow_wakeup_ports: Int)(implicit p: Parameters) extends Boom
       }
       when (isValid && slotUop.validated)
       {
+         if (DEBUG_VB)
          printf("A valid entry has been removed with the instruction being DASM(%x)\n", slotUop.inst)
       }
       .otherwise
@@ -208,6 +210,7 @@ class IssueSlot(num_slow_wakeup_ports: Int)(implicit p: Parameters) extends Boom
       when (isValid && !io.grant)
       {
          wasKilled := Bool(true)
+         if (DEBUG_VB)
          printf("There was a mispredict for DASM(%x) with r1 as %d and r2 as %d with grant %b\n",slotUop.inst,slotUop.pop1, slotUop.pop2, io.grant)
       }
    }
@@ -277,6 +280,7 @@ class IssueSlot(num_slow_wakeup_ports: Int)(implicit p: Parameters) extends Boom
       when (io.commit.valids(w) && (io.commit.uops(w).rob_idx === slotUop.rob_idx) && isValid)
       {
          slotUop.validated := Bool(true)
+         if (DEBUG_VB)
          printf("This MicroOp does have a load queue id of %d and rob_id of %d and it is [DASM(%x)]",io.commit.uops(w).ldq_idx,io.commit.uops(w).rob_idx, slotUop.inst)
       }
    }

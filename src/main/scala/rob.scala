@@ -391,10 +391,12 @@ class Rob(width: Int,
       if (DEBUG_VB){
          when (io.receive_validated_ld.valid && MatchBank(GetBankIdx(io.receive_validated_ld.bits.rob_idx))){
             rob_validated(GetRowIdx(io.receive_validated_ld.bits.rob_idx)) := Bool(true)
+            if (DEBUG_VB)
             printf("\n-------- Received the load valid signal from the lsu\n")
          }
          when (io.receive_validated_st.valid && MatchBank(GetBankIdx(io.receive_validated_st.bits.rob_idx))){
             rob_validated(GetRowIdx(io.receive_validated_st.bits.rob_idx)) := Bool(true)
+            if (DEBUG_VB)
             printf("\n-------- Received the store valid signal from the lsu\n")
          }
       }
@@ -562,6 +564,7 @@ class Rob(width: Int,
          //kill instruction if mispredict & br mask match
          when (io.brinfo.valid && io.brinfo.mispredict && entry_match)
          {
+            if (DEBUG_VB)
             printf("Mispredict\n")
             rob_val(i) := Bool(false)
             rob_uop(UInt(i)).inst := BUBBLE
@@ -583,6 +586,7 @@ class Rob(width: Int,
       // -----------------------------------------------
       // Outputs
       when (rob_uop(rob_head).flush_on_commit){
+         if (DEBUG_VB)
          printf("Is a flush on commit "+ w+ "\n")
       }
       rob_head_vals(w)     := rob_val(rob_head)
