@@ -985,7 +985,7 @@ class BoomCore(implicit p: Parameters, edge: uncore.tilelink2.TLEdgeOut) extends
          num_to_add := num_to_add + UInt(1)
       }
    }
-   num_insts := num_ints + num_to_add
+   num_insts := num_insts + num_to_add
    assert(!(num_insts(22)), "Has run for 2^22 instructions")
    fp_pipeline.io.debug_tsc_reg := debug_tsc_reg
 
