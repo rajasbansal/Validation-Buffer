@@ -328,8 +328,8 @@ class DCacheShim(implicit p: Parameters) extends BoomModule()(p)
                            Bool(false)))  // filter out nacked responses
    when (cache_load_ack && inflight_load_buffer(resp_tag).was_killed)
    {
-      printf("We killed inst [DASM(%x)] and so no response\n",inflight_load_buffer(resp_tag).out_uop.inst)
-      printf("The validated of this uop is %d and this gave the response %d\n", inflight_load_buffer(resp_tag).out_uop.validated,(inflight_load_buffer(resp_tag).was_killed && inflight_load_buffer(resp_tag).out_uop.validated))
+      // printf("We killed inst [DASM(%x)] and so no response\n",inflight_load_buffer(resp_tag).out_uop.inst)
+      // printf("The validated of this uop is %d and this gave the response %d\n", inflight_load_buffer(resp_tag).out_uop.validated,(inflight_load_buffer(resp_tag).was_killed && inflight_load_buffer(resp_tag).out_uop.validated))
    }
    val m2_req_valid = was_store_and_not_amo && !io.dmem.s2_nack && !RegNext(io.core.req.bits.kill)
    io.core.resp.bits.uop := Mux(m2_req_valid, m2_req_uop, inflight_load_buffer(resp_tag).out_uop)

@@ -530,7 +530,7 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
       val new_uop = Wire(init=exe_ld_uop)
       new_uop.validated := will_fire_load_wakeup
       io.memreq_uop   := new_uop
-      printf("Executing the load id %d and inst [DASM(%x)]\n", exe_ld_uop.ldq_idx, exe_ld_uop.inst)
+      // printf("Executing the load id %d and inst [DASM(%x)]\n", exe_ld_uop.ldq_idx, exe_ld_uop.inst)
       laq_executed(exe_ld_uop.ldq_idx) := Bool(true)
       laq_failure (exe_ld_uop.ldq_idx) := (will_fire_load_incoming && (ma_ld || pf_ld)) ||
                                           (will_fire_load_retry && pf_ld)
@@ -845,12 +845,12 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
       when (io.memresp.bits.is_load)
       {
          laq_succeeded(io.memresp.bits.ldq_idx) := Bool(true)
-         printf("Received the memory response from the the load queue id %d\n", io.memresp.bits.ldq_idx)
+         // printf("Received the memory response from the the load queue id %d\n", io.memresp.bits.ldq_idx)
       }
       .otherwise
       {
          stq_succeeded(io.memresp.bits.stq_idx) := Bool(true)
-         printf("Received the memory response from the store id %d\n", io.memresp.bits.stq_idx)
+         // printf("Received the memory response from the store id %d\n", io.memresp.bits.stq_idx)
          if (O3PIPEVIEW_PRINTF)
          {
             // TODO supress printing out a store-comp for lr instructions.
@@ -868,7 +868,7 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
       {
          laq_validated(io.commit.uops(w).ldq_idx)     := Bool(true)
          laq_uop(io.commit.uops(w).ldq_idx).validated := Bool(true)
-         printf("This %d has been validated with inst [DASM(%x)]\n", io.commit.uops(w).ldq_idx, io.commit.uops(w).inst)
+         // printf("This %d has been validated with inst [DASM(%x)]\n", io.commit.uops(w).ldq_idx, io.commit.uops(w).inst)
       }
    }
    //-------------------------------------------------------------
@@ -1179,7 +1179,7 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
       val row_idx = (wb_uop.ldq_idx)
       when (wb_resp.valid && wb_uop.is_load && (wb_resp.bits.uop.inst === laq_uop(row_idx).inst) && laq_allocated(row_idx))
       {
-         printf("The load has been completed %d\n", row_idx)
+         // printf("The load has been completed %d\n", row_idx)
          laq_completed(row_idx) := Bool(true)
          assert (laq_allocated(row_idx), "[lsu] trying to commit an un-allocated load entry.")
          assert (laq_executed(row_idx), "[lsu] trying to commit an un-executed load entry.")

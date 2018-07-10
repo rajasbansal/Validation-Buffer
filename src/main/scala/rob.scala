@@ -562,7 +562,7 @@ class Rob(width: Int,
          //kill instruction if mispredict & br mask match
          when (io.brinfo.valid && io.brinfo.mispredict && entry_match)
          {
-            printf("Mispredict\n")
+            // printf("Mispredict\n")
             rob_val(i) := Bool(false)
             rob_uop(UInt(i)).inst := BUBBLE
          }
@@ -583,7 +583,7 @@ class Rob(width: Int,
       // -----------------------------------------------
       // Outputs
       when (rob_uop(rob_head).flush_on_commit){
-         printf("Is a flush on commit "+ w+ "\n")
+         // printf("Is a flush on commit "+ w+ "\n")
       }
       rob_head_vals(w)     := rob_val(rob_head)
       rob_head_validated(w):= rob_validated(rob_head)
