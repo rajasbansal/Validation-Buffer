@@ -554,11 +554,11 @@ class MemExeUnit(implicit p: Parameters) extends ExecutionUnit(num_rf_read_ports
 
    when (io.lsu_io.memreq_uop.is_load && io.lsu_io.memreq_val)
    {
-      printf("Receiving try1- %b for [DASM(%x)]\n", io.lsu_io.memreq_uop.validated, io.lsu_io.memreq_uop.inst)
+      // printf("Receiving try1- %b for [DASM(%x)]\n", io.lsu_io.memreq_uop.validated, io.lsu_io.memreq_uop.inst)
    }
    when (io.lsu_io.memreq_kill)
    {
-      printf("We killed [DASM(%x)]", io.lsu_io.memreq_uop.inst)
+      // printf("We killed [DASM(%x)]", io.lsu_io.memreq_uop.inst)
    }
   
    // I should be timing forwarding to coincide with dmem resps, so I'm not clobbering

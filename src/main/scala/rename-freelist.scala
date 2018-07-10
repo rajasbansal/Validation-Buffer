@@ -180,7 +180,7 @@ class RenameFreeListHelper(
        //   }
          // pending_readers_list(io.pending_readers_regs(w)) := pending_readers_list(io.pending_readers_regs(w)) + templist.reduce(_+_)
          // pending_readers_list(io.pending_readers_regs(w)) := pending_readers_list(io.pending_readers_regs(w)) + Vec((io.pending_readers_regs zip io.pending_readers_vals) map {case (v,val_bit) => (v === io.pending_readers_regs(w)) && val_bit}).count({case (v) => v}) - Vec((io.done_readers_regs zip io.done_readers_vals) map {case (v,val_bit) => (v === io.pending_readers_regs(w)) && val_bit}).count({case (v) => v})
-         printf("Increasing the pending readers of %d with value %d\n", io.pending_readers_regs(w), pending_readers_list(io.pending_readers_regs(w)))
+         // printf("Increasing the pending readers of %d with value %d\n", io.pending_readers_regs(w), pending_readers_list(io.pending_readers_regs(w)))
       }
    }
 
@@ -189,7 +189,7 @@ class RenameFreeListHelper(
       when (io.done_readers_vals(w))
       {
          // pending_readers_list(io.done_readers_regs(w)) := pending_readers_list(io.done_readers_regs(w)) + Vec((io.pending_readers_regs zip io.pending_readers_vals) map {case (v,val_bit) => (v === io.done_readers_regs(w)) && val_bit}).count({case (v) => v}) - Vec((io.done_readers_regs zip io.done_readers_vals) map {case (v,val_bit) => (v === io.done_readers_vals(w)) && val_bit}).count({case (v) => v})
-         printf("Decreasing the pending readers of %d with value %d\n", io.done_readers_regs(w), pending_readers_list(io.done_readers_regs(w)))
+         // printf("Decreasing the pending readers of %d with value %d\n", io.done_readers_regs(w), pending_readers_list(io.done_readers_regs(w)))
       }
    }
    for (i <- 0 until num_phys_registers)
@@ -267,7 +267,7 @@ class RenameFreeListHelper(
       {
          enq_mask(w) := UInt(1) << io.rollback_pdsts(w)
          pending_readers_list(io.rollback_pdsts(w)) := UInt(0)
-         printf("Changing the register %d to 0", io.rollback_pdsts(w))
+         // printf("Changing the register %d to 0", io.rollback_pdsts(w))
       }
    }
 
@@ -338,7 +338,7 @@ class RenameFreeListHelper(
    {
       when (newfree_list(i) === UInt(0))
       {
-         printf(i+" register is not free :( %d and %d and pending readers %d\n",valid_remapping_list(i), io.table_bsy(i), pending_readers_list(i))
+         // printf(i+" register is not free :( %d and %d and pending readers %d\n",valid_remapping_list(i), io.table_bsy(i), pending_readers_list(i))
       }
    }
 
@@ -347,7 +347,7 @@ class RenameFreeListHelper(
    {
       when (!io.table_bsy(i) && valid_remapping_list(i) && (pending_readers_list(i) != UInt(0)))
       {
-         printf("Had to reclaim because unused for too long\n")
+         // printf("Had to reclaim because unused for too long\n")
          used_for_long(i) := used_for_long(i) + UInt(1)
          when (used_for_long(i) === UInt(200))
          {
@@ -469,19 +469,19 @@ class RenameFreeList(
 
       when (io.pending_readers(w).valid && (io.pending_readers(w).bits.lrs1_rtype === UInt(rtype)))
       {
-      	printf("RegisterSource1 is %d for [DASM(%x)]\n",io.pending_readers(w).bits.pop1,io.pending_readers(w).bits.inst)
+      	// printf("RegisterSource1 is %d for [DASM(%x)]\n",io.pending_readers(w).bits.pop1,io.pending_readers(w).bits.inst)
       }
    	when (io.pending_readers(w).valid && (io.pending_readers(w).bits.lrs2_rtype === UInt(rtype)))
       {
-      	printf("RegisterSource2 is %d for [DASM(%x)]\n",io.pending_readers(w).bits.pop2,io.pending_readers(w).bits.inst)
+      	// printf("RegisterSource2 is %d for [DASM(%x)]\n",io.pending_readers(w).bits.pop2,io.pending_readers(w).bits.inst)
       }
    	when (io.pending_readers(w).valid && (io.pending_readers(w).bits.frs3_en))
       {
-      	printf("RegisterSource3 is %d for [DASM(%x)]\n",io.pending_readers(w).bits.pop3,io.pending_readers(w).bits.inst)
+      	// printf("RegisterSource3 is %d for [DASM(%x)]\n",io.pending_readers(w).bits.pop3,io.pending_readers(w).bits.inst)
       }
    	when (io.pending_readers(w).valid && (io.pending_readers(w).bits.lrs1_rtype === RT_PAS))
       {
-      	printf("Pass Through Register is %d for [DASM(%x)]\n",io.pending_readers(w).bits.pop1,io.pending_readers(w).bits.inst)
+      	// printf("Pass Through Register is %d for [DASM(%x)]\n",io.pending_readers(w).bits.pop1,io.pending_readers(w).bits.inst)
       }
    }
 
@@ -495,15 +495,15 @@ class RenameFreeList(
       freelist.io.done_readers_regs(w + (size1 + size2) * 2) := io.pending_done_1(w).bits.pop3
       when (io.pending_done_1(w).valid && (io.pending_done_1(w).bits.lrs1_rtype === UInt(rtype)))
       {
-         printf("Decrement register1 %d for [DASM(%x)]\n",io.pending_done_1(w).bits.pop1,io.pending_done_1(w).bits.inst)
+         // printf("Decrement register1 %d for [DASM(%x)]\n",io.pending_done_1(w).bits.pop1,io.pending_done_1(w).bits.inst)
       }
       when (io.pending_done_1(w).valid && (io.pending_done_1(w).bits.lrs2_rtype === UInt(rtype)))
       {
-         printf("Decrement register2 %d for [DASM(%x)]\n",io.pending_done_1(w).bits.pop2,io.pending_done_1(w).bits.inst)
+         // printf("Decrement register2 %d for [DASM(%x)]\n",io.pending_done_1(w).bits.pop2,io.pending_done_1(w).bits.inst)
       }
       when (io.pending_done_1(w).valid && (io.pending_done_1(w).bits.frs3_en))
       {
-         printf("Decrement register3 %d for [DASM(%x)]\n",io.pending_done_1(w).bits.pop3,io.pending_done_1(w).bits.inst)
+         // printf("Decrement register3 %d for [DASM(%x)]\n",io.pending_done_1(w).bits.pop3,io.pending_done_1(w).bits.inst)
       }
    }
 
@@ -517,15 +517,15 @@ class RenameFreeList(
       freelist.io.done_readers_regs(size1 + w + (size1 + size2) * 2) := io.pending_done_2(w).bits.pop3
       when (io.pending_done_2(w).valid && (io.pending_done_2(w).bits.lrs1_rtype === UInt(rtype)))
       {
-         printf("Decrement register1 %d for [DASM(%x)]\n",io.pending_done_2(w).bits.pop1,io.pending_done_2(w).bits.inst)
+         // printf("Decrement register1 %d for [DASM(%x)]\n",io.pending_done_2(w).bits.pop1,io.pending_done_2(w).bits.inst)
       }
       when (io.pending_done_2(w).valid && (io.pending_done_2(w).bits.lrs2_rtype === UInt(rtype)))
       {
-         printf("Decrement register2 %d for [DASM(%x)]\n",io.pending_done_2(w).bits.pop2,io.pending_done_2(w).bits.inst)
+         // printf("Decrement register2 %d for [DASM(%x)]\n",io.pending_done_2(w).bits.pop2,io.pending_done_2(w).bits.inst)
       }
       when (io.pending_done_2(w).valid && (io.pending_done_2(w).bits.frs3_en))
       {
-         printf("Decrement register3 %d for [DASM(%x)]\n",io.pending_done_2(w).bits.pop3,io.pending_done_2(w).bits.inst)
+         // printf("Decrement register3 %d for [DASM(%x)]\n",io.pending_done_2(w).bits.pop3,io.pending_done_2(w).bits.inst)
       }
    }
 

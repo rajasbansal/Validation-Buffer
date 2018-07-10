@@ -85,7 +85,7 @@ class IssueSlot(num_slow_wakeup_ports: Int)(implicit p: Parameters) extends Boom
       
       when (isValid)
       {
-         printf("--- There was a pipeline flush\n")
+         // printf("--- There was a pipeline flush\n")
       }
       when (isValid && !slotUop.validated)
       {
@@ -94,7 +94,7 @@ class IssueSlot(num_slow_wakeup_ports: Int)(implicit p: Parameters) extends Boom
       }
       when (isValid && slotUop.validated)
       {
-         printf("A valid entry has been removed with the instruction being DASM(%x)\n", slotUop.inst)
+         // printf("A valid entry has been removed with the instruction being DASM(%x)\n", slotUop.inst)
       }
       .otherwise
       {
