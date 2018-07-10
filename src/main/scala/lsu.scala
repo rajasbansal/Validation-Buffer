@@ -1038,7 +1038,7 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
    io.emit_validated_ld.bits.rob_idx := laq_uop(exe_ld_idx_wakeup).rob_idx
    if (DEBUG_VB){   
       when (io.emit_validated_ld.valid) {
-         printf("\n---- This load has been validated %d\n", io.emit_validated_ld.bits.rob_idx)
+         // printf("\n---- This load has been validated %d\n", io.emit_validated_ld.bits.rob_idx)
       }
    }
    // Emit the validated store
@@ -1050,7 +1050,7 @@ class LoadStoreUnit(pl_width: Int, num_wakeup_ports: Int)(implicit p: Parameters
    io.emit_validated_st.bits.rob_idx := clr_bsy_robidx
    if (DEBUG_VB){ 
       when (io.emit_validated_st.valid) {
-         printf("\n---- This store has been validated %d\n", io.emit_validated_st.bits.rob_idx)
+         // printf("\n---- This store has been validated %d\n", io.emit_validated_st.bits.rob_idx)
       }
    }
    //-------------------------------------------------------------

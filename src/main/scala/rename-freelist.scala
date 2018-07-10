@@ -189,7 +189,7 @@ class RenameFreeListHelper(
       when (io.done_readers_vals(w))
       {
          // pending_readers_list(io.done_readers_regs(w)) := pending_readers_list(io.done_readers_regs(w)) + Vec((io.pending_readers_regs zip io.pending_readers_vals) map {case (v,val_bit) => (v === io.done_readers_regs(w)) && val_bit}).count({case (v) => v}) - Vec((io.done_readers_regs zip io.done_readers_vals) map {case (v,val_bit) => (v === io.done_readers_vals(w)) && val_bit}).count({case (v) => v})
-         printf("Decreasing the pending readers of %d with value %d\n", io.done_readers_regs(w), pending_readers_list(io.done_readers_regs(w)))
+         // printf("Decreasing the pending readers of %d with value %d\n", io.done_readers_regs(w), pending_readers_list(io.done_readers_regs(w)))
       }
    }
    for (i <- 0 until num_phys_registers)

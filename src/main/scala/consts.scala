@@ -31,7 +31,7 @@ trait BOOMDebugConstants
    val DEBUG_PRINTF_ROB    = true && DEBUG_PRINTF
    val DEBUG_PRINTF_TAGE   = false && DEBUG_PRINTF
    val DEBUG_PRINTF_BROB   = false && DEBUG_PRINTF
-   val DEBUG_VB            = false
+   val DEBUG_VB            = true
 
    // BPD asserts can be too heavy-handed for something that we're okay giving incorrect answers.
    val ENABLE_BPD_ASSERTS  = false
