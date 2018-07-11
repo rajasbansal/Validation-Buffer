@@ -952,6 +952,11 @@ class BoomCore(implicit p: Parameters, edge: uncore.tilelink2.TLEdgeOut) extends
    val idle_cycles = util.WideCounter(32)
    when (rob.io.commit.valids.toBits.orR || reset.toBool) { idle_cycles := UInt(0) }
    assert (!(idle_cycles.value(13)), "Pipeline has hung.")
+   when (debug_irt_reg(22))
+   {
+      printf("Took %d cycles to reach here\n", debug_tsc_reg)
+   }
+   assert(!(debug_irt_reg(22)), "Has run for 2^22 instructions and with cycles")
 
    fp_pipeline.io.debug_tsc_reg := debug_tsc_reg
 
