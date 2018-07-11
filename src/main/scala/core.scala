@@ -956,6 +956,10 @@ class BoomCore(implicit p: Parameters, edge: uncore.tilelink2.TLEdgeOut) extends
    {
       printf("Took %d cycles to reach here\n", debug_tsc_reg)
    }
+   when (debug_tsc_reg % UInt(100000) === UInt(0))
+   {
+      printf("Done %d instructions till now at cycle number %d\n", debug_irt_reg, debug_tsc_reg)
+   }
    assert(!(debug_irt_reg(22)), "Has run for 2^22 instructions and with cycles")
 
    fp_pipeline.io.debug_tsc_reg := debug_tsc_reg
